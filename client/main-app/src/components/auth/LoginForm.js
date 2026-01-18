@@ -47,7 +47,13 @@ export default function LoginForm({ role }) {
         
         // Redirect logic (Safe Check)
         if (userData.role) {
-            setTimeout(() => router.push(`/${userData.role}/dashboard`), 1000);
+            setTimeout(() => {
+                if (userData.role === 'student') {
+                    router.push(`/student/profile`);
+                } else {
+                    router.push(`/${userData.role}/dashboard`);
+                }
+            }, 1000);
         } else {
             toast.error("Role missing in user data!", { id: toastId });
         }
