@@ -36,9 +36,8 @@ export default function Header() {
         {/* --- LEFT: LOGO --- */}
         <Link href="/" className="flex items-center gap-1 group shrink-0">
             <span className="text-xl md:text-2xl font-bold tracking-tight text-gray-900">
-                ABC<span className="text-[#8834D3]">Hub</span>
+                Journal
             </span>
-            <span className="w-1.5 h-1.5 rounded-full bg-[#8834D3] mt-2 group-hover:animate-pulse"></span>
         </Link>
         
         {/* --- CENTER: DESKTOP NAVIGATION (Pill Design) --- */}
@@ -63,7 +62,7 @@ export default function Header() {
           {user ? (
             /* LOGGED IN STATE */
             <div className="flex items-center gap-2 md:gap-4">
-              <Link href={`/${user.role || user.user.role}/dashboard`}> 
+              <Link href={`/${user.user.role}/${user.user.role === 'student' ? 'profile' : 'dashboard'}`}> 
                 <div className={`flex items-center gap-2 cursor-pointer px-2 py-1 md:px-3 md:py-1.5 rounded-full transition-all hover:bg-gray-50`}>
                     <div className="w-8 h-8 rounded-full bg-[#EAD7FC] flex items-center justify-center text-[#8834D3] font-bold text-xs">
                         {displayName.charAt(0).toUpperCase()}
