@@ -65,8 +65,11 @@ export function AuthProvider({ children }) {
 
   const login = (userData, token) => {
     if (token) localStorage.setItem("token", token);
-    localStorage.setItem("user", JSON.stringify(userData));
-    setUser(userData);
+    const userToStore = userData?.user || userData;
+    localStorage.setItem("user", JSON.stringify(userToStore));
+    setUser(userToStore);
+    // Force re-render by triggering a state change
+    window.dispatchEvent(new Event("storage"));
   };
 
   const logout = () => {
