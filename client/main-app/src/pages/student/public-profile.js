@@ -96,46 +96,77 @@ export default function PublicProfile() {
 
   return (
     <Layout>
-      <div className="max-w-4xl mx-auto space-y-6 pb-10">
+      <div className="max-w-5xl mx-auto space-y-6 pb-10">
         {/* Notification */}
         {notification && (
           <div
-            className={`fixed top-4 right-4 z-50 px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3 animate-bounce-in border ${
+            className={`fixed top-4 right-4 z-50 px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3 animate-in slide-in-from-top duration-300 border backdrop-blur-sm ${
               notification.type === "success"
-                ? "bg-[#1E1E2E] border-green-500 text-green-400"
-                : "bg-[#1E1E2E] border-red-500 text-red-400"
+                ? "bg-linear-to-r from-green-900/90 to-emerald-900/90 border-green-500/50 text-green-100 shadow-green-500/20"
+                : "bg-linear-to-r from-red-900/90 to-rose-900/90 border-red-500/50 text-red-100 shadow-red-500/20"
             }`}
           >
             {notification.type === "success" ? (
-              <FiSave className="text-xl" />
+              <FiSave className="text-2xl" />
             ) : (
-              <FiAlertTriangle className="text-xl" />
+              <FiAlertTriangle className="text-2xl" />
             )}
             <p className="font-semibold">{notification.message}</p>
           </div>
         )}
 
-        {/* Header */}
-        <div className="bg-[#1E1E2E] p-6 rounded-xl border border-gray-800">
-          <h1 className="text-2xl font-bold text-white">Public profile</h1>
-          <p className="text-gray-400 text-sm mt-1">
-            Add information about yourself
-          </p>
+        {/* Header with avatar */}
+        <div className="bg-linear-to-br from-[#1E1E2E] via-[#2B2B40] to-[#1E1E2E] p-8 rounded-2xl border border-purple-500/20 shadow-xl relative overflow-hidden">
+          <div className="absolute -right-20 -top-20 w-64 h-64 bg-purple-600/10 rounded-full blur-3xl"></div>
+          <div className="absolute -left-10 -bottom-10 w-48 h-48 bg-pink-600/10 rounded-full blur-3xl"></div>
+          <div className="relative z-10 flex items-center gap-6">
+            <div className="w-24 h-24 rounded-full bg-linear-to-br from-purple-600 to-pink-600 flex items-center justify-center overflow-hidden shadow-xl border-4 border-[#2B2B40]">
+              {currentUser?.avatar ? (
+                <Image
+                  src={currentUser.avatar}
+                  alt={displayName}
+                  width={96}
+                  height={96}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <span className="text-3xl font-bold text-white">
+                  {displayName.charAt(0).toUpperCase()}
+                </span>
+              )}
+            </div>
+            <div>
+              <h1 className="text-3xl font-extrabold text-white">
+                {displayName}
+              </h1>
+              <p className="text-gray-300 text-sm mt-1 font-medium">
+                {currentUser?.email}
+              </p>
+              <p className="text-purple-400 text-sm mt-2">
+                Complete your public profile to stand out
+              </p>
+            </div>
+          </div>
         </div>
 
         {/* Profile Form */}
         <form
           onSubmit={handleSubmit}
-          className="bg-[#1E1E2E] p-8 rounded-xl border border-gray-800 space-y-6"
+          className="bg-linear-to-br from-[#1E1E2E] to-[#2B2B40] p-8 rounded-2xl border border-gray-800/50 shadow-xl space-y-8"
         >
           {/* Basics Section */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-white mb-4">Basics:</h3>
+          <div className="space-y-5">
+            <div className="flex items-center gap-3 pb-4 border-b border-gray-700/50">
+              <div className="w-1 h-6 bg-linear-to-b from-purple-500 to-pink-500 rounded-full"></div>
+              <h3 className="text-xl font-bold text-white">
+                Basic Information
+              </h3>
+            </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm text-gray-400 mb-2">
-                  First Name
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div className="space-y-2">
+                <label className="block text-sm font-semibold text-gray-300">
+                  First Name <span className="text-purple-400">*</span>
                 </label>
                 <input
                   type="text"
@@ -146,13 +177,13 @@ export default function PublicProfile() {
                       firstName: e.target.value,
                     })
                   }
-                  className="w-full bg-[#0F0F16] border border-gray-700/50 rounded-lg px-4 py-3 text-white focus:border-purple-500 focus:ring-1 focus:ring-purple-500 focus:outline-none"
-                  placeholder="First"
+                  className="w-full bg-[#0F0F16] border border-gray-700 rounded-xl px-4 py-3.5 text-white placeholder-gray-500 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/50 focus:outline-none transition-all duration-200"
+                  placeholder="Enter first name"
                 />
               </div>
 
-              <div>
-                <label className="block text-sm text-gray-400 mb-2">
+              <div className="space-y-2">
+                <label className="block text-sm font-semibold text-gray-300">
                   Last Name
                 </label>
                 <input
@@ -161,16 +192,16 @@ export default function PublicProfile() {
                   onChange={(e) =>
                     setProfileData({ ...profileData, lastName: e.target.value })
                   }
-                  className="w-full bg-[#0F0F16] border border-gray-700/50 rounded-lg px-4 py-3 text-white focus:border-purple-500 focus:ring-1 focus:ring-purple-500 focus:outline-none"
-                  placeholder="Last"
+                  className="w-full bg-[#0F0F16] border border-gray-700 rounded-xl px-4 py-3.5 text-white placeholder-gray-500 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/50 focus:outline-none transition-all duration-200"
+                  placeholder="Enter last name"
                 />
               </div>
             </div>
 
-            <div>
-              <label className="block text-sm text-gray-400 mb-2">
+            <div className="space-y-2">
+              <label className="block text-sm font-semibold text-gray-300">
                 Headline
-                <span className="float-right text-xs">
+                <span className="float-right text-xs text-gray-500">
                   {profileData.headline.length}/60
                 </span>
               </label>
@@ -181,36 +212,43 @@ export default function PublicProfile() {
                 onChange={(e) =>
                   setProfileData({ ...profileData, headline: e.target.value })
                 }
-                className="w-full bg-[#0F0F16] border border-gray-700/50 rounded-lg px-4 py-3 text-white focus:border-purple-500 focus:ring-1 focus:ring-purple-500 focus:outline-none"
-                placeholder='Add a professional headline like, "Instructor at Udemy" or "Architect."'
+                className="w-full bg-[#0F0F16] border border-gray-700 rounded-xl px-4 py-3.5 text-white placeholder-gray-500 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/50 focus:outline-none transition-all duration-200"
+                placeholder='e.g., "Full Stack Developer" or "UI/UX Designer"'
               />
             </div>
           </div>
 
           {/* Biography */}
-          <div>
-            <h3 className="text-lg font-semibold text-white mb-4">Biography</h3>
+          <div className="space-y-3">
+            <div className="flex items-center gap-3 pb-4 border-b border-gray-700/50">
+              <div className="w-1 h-6 bg-linear-to-b from-purple-500 to-pink-500 rounded-full"></div>
+              <h3 className="text-xl font-bold text-white">About You</h3>
+            </div>
             <textarea
               value={profileData.bio}
               onChange={(e) =>
                 setProfileData({ ...profileData, bio: e.target.value })
               }
               rows={6}
-              className="w-full bg-[#0F0F16] border border-gray-700/50 rounded-lg px-4 py-3 text-white focus:border-purple-500 focus:ring-1 focus:ring-purple-500 focus:outline-none resize-none"
-              placeholder="Biography"
+              className="w-full bg-[#0F0F16] border border-gray-700 rounded-xl px-4 py-3.5 text-white placeholder-gray-500 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/50 focus:outline-none resize-none transition-all duration-200"
+              placeholder="Tell us about yourself, your experience, and what you're passionate about..."
             />
-            <p className="text-xs text-gray-500 mt-2">
-              Links and coupon codes are not permitted in this section.
+            <p className="text-xs text-gray-500">
+              💡 Links and promotional content are not permitted in this
+              section.
             </p>
           </div>
 
           {/* Links */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-white mb-4">Links:</h3>
+          <div className="space-y-5">
+            <div className="flex items-center gap-3 pb-4 border-b border-gray-700/50">
+              <div className="w-1 h-6 bg-linear-to-b from-purple-500 to-pink-500 rounded-full"></div>
+              <h3 className="text-xl font-bold text-white">Social Links</h3>
+            </div>
 
-            <div>
-              <label className="block text-sm text-gray-400 mb-2">
-                Website
+            <div className="space-y-2">
+              <label className="block text-sm font-semibold text-gray-300">
+                🌐 Website
               </label>
               <input
                 type="url"
@@ -218,18 +256,18 @@ export default function PublicProfile() {
                 onChange={(e) =>
                   setProfileData({ ...profileData, website: e.target.value })
                 }
-                className="w-full bg-[#0F0F16] border border-gray-700/50 rounded-lg px-4 py-3 text-white focus:border-purple-500 focus:ring-1 focus:ring-purple-500 focus:outline-none"
-                placeholder="Website (http(s)://..)"
+                className="w-full bg-[#0F0F16] border border-gray-700 rounded-xl px-4 py-3.5 text-white placeholder-gray-500 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/50 focus:outline-none transition-all duration-200"
+                placeholder="https://yourwebsite.com"
               />
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm text-gray-400 mb-2">
-                  Twitter
+                <label className="flex items-center gap-2 text-sm text-gray-400 mb-2">
+                  <span className="text-lg">🐦</span> Twitter
                 </label>
-                <div className="flex items-center bg-[#0F0F16] border border-gray-700/50 rounded-lg overflow-hidden">
-                  <span className="px-3 text-gray-500 text-sm">
+                <div className="group flex items-center bg-[#0F0F16] border border-gray-700 rounded-xl overflow-hidden transition-all focus-within:ring-2 focus-within:ring-purple-500/50 focus-within:border-purple-500 hover:border-gray-600">
+                  <span className="px-4 text-gray-500 text-sm border-r border-gray-700">
                     twitter.com/
                   </span>
                   <input
@@ -241,18 +279,18 @@ export default function PublicProfile() {
                         twitter: e.target.value,
                       })
                     }
-                    className="flex-1 bg-transparent px-2 py-3 text-white focus:outline-none"
-                    placeholder="Username"
+                    className="flex-1 bg-transparent px-4 py-3.5 text-white focus:outline-none placeholder-gray-500"
+                    placeholder="yourusername"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm text-gray-400 mb-2">
-                  Facebook
+                <label className="flex items-center gap-2 text-sm text-gray-400 mb-2">
+                  <span className="text-lg">📘</span> Facebook
                 </label>
-                <div className="flex items-center bg-[#0F0F16] border border-gray-700/50 rounded-lg overflow-hidden">
-                  <span className="px-3 text-gray-500 text-sm">
+                <div className="group flex items-center bg-[#0F0F16] border border-gray-700 rounded-xl overflow-hidden transition-all focus-within:ring-2 focus-within:ring-purple-500/50 focus-within:border-purple-500 hover:border-gray-600">
+                  <span className="px-4 text-gray-500 text-sm border-r border-gray-700">
                     facebook.com/
                   </span>
                   <input
@@ -264,19 +302,19 @@ export default function PublicProfile() {
                         facebook: e.target.value,
                       })
                     }
-                    className="flex-1 bg-transparent px-2 py-3 text-white focus:outline-none"
-                    placeholder="Username"
+                    className="flex-1 bg-transparent px-4 py-3.5 text-white focus:outline-none placeholder-gray-500"
+                    placeholder="yourusername"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm text-gray-400 mb-2">
-                  LinkedIn
+                <label className="flex items-center gap-2 text-sm text-gray-400 mb-2">
+                  <span className="text-lg">💼</span> LinkedIn
                 </label>
-                <div className="flex items-center bg-[#0F0F16] border border-gray-700/50 rounded-lg overflow-hidden">
-                  <span className="px-3 text-gray-500 text-sm">
-                    linkedin.com/
+                <div className="group flex items-center bg-[#0F0F16] border border-gray-700 rounded-xl overflow-hidden transition-all focus-within:ring-2 focus-within:ring-purple-500/50 focus-within:border-purple-500 hover:border-gray-600">
+                  <span className="px-4 text-gray-500 text-sm border-r border-gray-700">
+                    linkedin.com/in/
                   </span>
                   <input
                     type="text"
@@ -287,18 +325,18 @@ export default function PublicProfile() {
                         linkedin: e.target.value,
                       })
                     }
-                    className="flex-1 bg-transparent px-2 py-3 text-white focus:outline-none"
-                    placeholder="Resource ID"
+                    className="flex-1 bg-transparent px-4 py-3.5 text-white focus:outline-none placeholder-gray-500"
+                    placeholder="yourusername"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm text-gray-400 mb-2">
-                  YouTube
+                <label className="flex items-center gap-2 text-sm text-gray-400 mb-2">
+                  <span className="text-lg">📺</span> YouTube
                 </label>
-                <div className="flex items-center bg-[#0F0F16] border border-gray-700/50 rounded-lg overflow-hidden">
-                  <span className="px-3 text-gray-500 text-sm">
+                <div className="group flex items-center bg-[#0F0F16] border border-gray-700 rounded-xl overflow-hidden transition-all focus-within:ring-2 focus-within:ring-purple-500/50 focus-within:border-purple-500 hover:border-gray-600">
+                  <span className="px-4 text-gray-500 text-sm border-r border-gray-700">
                     youtube.com/
                   </span>
                   <input
@@ -310,8 +348,8 @@ export default function PublicProfile() {
                         youtube: e.target.value,
                       })
                     }
-                    className="flex-1 bg-transparent px-2 py-3 text-white focus:outline-none"
-                    placeholder="Username"
+                    className="flex-1 bg-transparent px-4 py-3.5 text-white focus:outline-none placeholder-gray-500"
+                    placeholder="@yourchannel"
                   />
                 </div>
               </div>
@@ -319,13 +357,21 @@ export default function PublicProfile() {
           </div>
 
           {/* Save Button */}
-          <div className="flex justify-end pt-4">
+          <div className="flex justify-end pt-6">
             <button
               type="submit"
               disabled={saving}
-              className="bg-[#6D28D9] hover:bg-[#5b21b6] text-white px-8 py-3 rounded-lg font-bold transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+              className="group relative bg-linear-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-10 py-4 rounded-xl font-bold transition-all shadow-lg hover:shadow-xl hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center gap-3"
             >
-              {saving ? "Saving..." : "Save"}
+              <FiSave className="text-xl" />
+              {saving ? (
+                <>
+                  <span className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></span>
+                  Saving...
+                </>
+              ) : (
+                "Save Profile"
+              )}
             </button>
           </div>
         </form>
