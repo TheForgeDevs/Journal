@@ -26,6 +26,10 @@ const lectureSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
+  moduleId: {
+    type: mongoose.Schema.Types.ObjectId,
+    required: [true, "Lecture must belong to a module"],
+  },
 });
 
 const courseSchema = new mongoose.Schema(
@@ -98,6 +102,17 @@ const courseSchema = new mongoose.Schema(
       default: 0,
     },
     isPublished: {
+      type: Boolean,
+      default: false,
+    },
+    modules: [
+      {
+        title: { type: String, required: true },
+        order: { type: Number, required: true },
+        description: String
+      }
+    ],
+    isArchived: {
       type: Boolean,
       default: false,
     },

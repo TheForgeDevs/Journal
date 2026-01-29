@@ -44,6 +44,8 @@ const nextConfig = {
         source: "/user/close-account",
         destination: "/student/close-account",
       },
+
+      
       // Tutor rewrites (placeholder - actual tutor pages will be created)
       {
         source: "/tutor/dashboard",

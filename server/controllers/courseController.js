@@ -7,7 +7,13 @@ import { deleteFromCloudinary } from "../config/cloudinary.js";
 // @desc    Create new course
 // @route   POST /api/courses
 // @access  Private/Tutor
+// CHANGE: Update createCourse to handle production validation
 export const createCourse = catchAsync(async (req, res, next) => {
+  const { price, title, category, level } = req.body;
+
+  // Basic production validation
+  if (price < 0) return next(new AppError("Price cannot be negative", 400));
+
   const courseData = {
     ...req.body,
     tutor: req.user._id,
@@ -17,9 +23,23 @@ export const createCourse = catchAsync(async (req, res, next) => {
 
   res.status(201).json({
     success: true,
-    message: "Course created successfully",
     data: { course },
   });
+});
+
+// ADD: Archive Course function (Requirement 2)
+export const archiveCourse = catchAsync(async (req, res, next) => {
+  const course = await Course.findById(req.params.id);
+
+  if (!course || course.tutor.toString() !== req.user._id.toString()) {
+    return next(new AppError("Course not found or unauthorized", 404));
+  }
+
+  course.isArchived = !course.isArchived;
+  course.isPublished = false; // Automatically unpublish if archived
+  await course.save();
+
+  res.status(200).json({ success: true, message: "Course status updated" });
 });
 
 // @desc    Get all courses (published)
@@ -327,4 +347,22 @@ export const getEnrolledCourses = catchAsync(async (req, res) => {
     count: courses.length,
     data: { courses },
   });
+});
+
+// @desc    Add a module to a course
+// @route   POST /api/courses/:id/modules
+export const addModule = catchAsync(async (req, res, next) => {
+  const course = await Course.findById(req.params.id);
+  
+  if (!course || course.tutor.toString() !== req.user._id.toString()) {
+    return next(new AppError("Course not found or unauthorized", 404));
+  }
+
+  course.modules.push({
+    title: req.body.title,
+    order: course.modules.length + 1
+  });
+
+  await course.save();
+  res.status(201).json({ success: true, data: course.modules });
 });
