@@ -35,7 +35,7 @@ export const getEnrolledCourses = () => API.get("/dashboard/courses");
 export const getPaymentHistory = () => API.get("/payments/history");
 
 // Tutor/Course specific APIs
-export const getTutorCourses = () => API.get('/courses/tutor/my-courses');
+export const getTutorCourses = () => API.get("/courses/tutor/my-courses");
 export const togglePublishCourse = (id) => API.patch(`/courses/${id}/publish`);
 
 // Course Management (Tutor)
@@ -43,7 +43,24 @@ export const createCourse = (data) => API.post("/courses", data);
 export const getCourse = (id) => API.get(`/courses/${id}`);
 export const updateCourse = (id, data) => API.put(`/courses/${id}`, data);
 export const addModule = (id, data) => API.post(`/courses/${id}/modules`, data);
+export const addLecture = (id, data) =>
+  API.post(`/courses/${id}/lectures`, data);
+export const updateLecture = (id, lectureId, data) =>
+  API.put(`/courses/${id}/lectures/${lectureId}`, data);
+export const deleteLecture = (id, lectureId) =>
+  API.delete(`/courses/${id}/lectures/${lectureId}`);
 export const archiveCourse = (id) => API.patch(`/courses/${id}/archive`);
+
+// Video Upload
+export const uploadVideo = (formData) =>
+  API.post("/videos/upload", formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+    timeout: 300000, // 5 minutes for large videos
+  });
+export const uploadThumbnail = (formData) =>
+  API.post("/videos/thumbnail", formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
 
 // Analytics
 export const getTutorStats = () => API.get("/dashboard/stats");
@@ -51,4 +68,5 @@ export const getTutorLearners = () => API.get("/enrollments/tutor/my-students");
 
 // Reviews
 export const getTutorReviews = () => API.get("/reviews/tutor");
-export const replyToReview = (id, data) => API.patch(`/reviews/${id}/reply`, data);
+export const replyToReview = (id, data) =>
+  API.patch(`/reviews/${id}/reply`, data);

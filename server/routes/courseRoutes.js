@@ -12,14 +12,15 @@ import {
   deleteLecture,
   getEnrolledCourses,
   archiveCourse,
+  addModule,
 } from "../controllers/courseController.js";
-import { protect, restrictTo } from "../middleware/auth.js";
+import { protect, restrictTo, optionalAuth } from "../middleware/auth.js";
 
 const router = express.Router();
 
-// Public routes
+// Public routes (with optional auth for owner access)
 router.get("/", getAllCourses);
-router.get("/:id", getCourse);
+router.get("/:id", optionalAuth, getCourse);
 
 // Protected routes - require authentication
 router.use(protect);
@@ -38,7 +39,11 @@ router.patch("/:id/publish", restrictTo("tutor"), togglePublishCourse);
 router.post("/:id/lectures", restrictTo("tutor"), addLecture);
 router.put("/:id/lectures/:lectureId", restrictTo("tutor"), updateLecture);
 router.delete("/:id/lectures/:lectureId", restrictTo("tutor"), deleteLecture);
-// ADD this route
+
+// Module management routes
+router.post("/:id/modules", restrictTo("tutor"), addModule);
+
+// Archive route
 router.patch("/:id/archive", restrictTo("tutor"), archiveCourse);
 
 export default router;
