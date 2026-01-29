@@ -93,3 +93,24 @@ export const getCourseEnrollments = catchAsync(async (req, res, next) => {
     data: { enrollments },
   });
 });
+
+
+// @desc    Get all students enrolled in a tutor's courses
+// @route   GET /api/enrollments/tutor/my-students
+export const getTutorStudents = catchAsync(async (req, res, next) => {
+  // Find all courses owned by this tutor
+  const courses = await Course.find({ tutor: req.user._id });
+  const courseIds = courses.map(c => c._id);
+
+  // Find all enrollments for those courses
+  const enrollments = await Enrollment.find({ course: { $in: courseIds } })
+    .populate("student", "name email")
+    .populate("course", "title")
+    .sort("-createdAt");
+
+  res.status(200).json({
+    success: true,
+    count: enrollments.length,
+    data: { enrollments }
+  });
+});

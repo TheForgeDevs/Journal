@@ -33,3 +33,7 @@ export const getEnrolledCourses = () => API.get("/dashboard/courses");
 
 // Payment APIs
 export const getPaymentHistory = () => API.get("/payments/history");
+
+// Tutor/Course specific APIs
+export const getTutorCourses = () => API.get('/courses/tutor/my-courses');
+export const togglePublishCourse = (id) => API.patch(`/courses/${id}/publish`);

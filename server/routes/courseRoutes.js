@@ -11,6 +11,7 @@ import {
   updateLecture,
   deleteLecture,
   getEnrolledCourses,
+  archiveCourse,
 } from "../controllers/courseController.js";
 import { protect, restrictTo } from "../middleware/auth.js";
 
@@ -37,5 +38,7 @@ router.patch("/:id/publish", restrictTo("tutor"), togglePublishCourse);
 router.post("/:id/lectures", restrictTo("tutor"), addLecture);
 router.put("/:id/lectures/:lectureId", restrictTo("tutor"), updateLecture);
 router.delete("/:id/lectures/:lectureId", restrictTo("tutor"), deleteLecture);
+// ADD this route
+router.patch("/:id/archive", restrictTo("tutor"), archiveCourse);
 
 export default router;
