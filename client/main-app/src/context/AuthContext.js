@@ -15,7 +15,8 @@ export function AuthProvider({ children }) {
     const init = async () => {
       setLoading(true);
       try {
-        const token = localStorage.getItem("token");
+        const token =
+          typeof window !== "undefined" ? localStorage.getItem("token") : null;
         const rawUser = localStorage.getItem("user");
 
         let parsed = null;
@@ -30,7 +31,8 @@ export function AuthProvider({ children }) {
 
         if (mounted && parsed) setUser(parsed);
 
-        if (token) {
+        // Only attempt to refresh from API when we have a valid token string
+        if (token && token !== "undefined") {
           // fetch authoritative user from API and sync localStorage
           try {
             const res = await getMe();
@@ -40,10 +42,28 @@ export function AuthProvider({ children }) {
               if (mounted) setUser(fetched);
             }
           } catch (err) {
-            console.error("Failed to refresh user from API:", err);
-            localStorage.removeItem("token");
-            localStorage.removeItem("user");
-            if (mounted) setUser(null);
+            // Handle unauthorized separately to avoid noisy stack traces
+            const status = err?.response?.status;
+            if (status === 401) {
+              // Token expired or invalid - redirect to login
+              console.warn(
+                "Session expired or invalid token (401). Redirecting to login.",
+              );
+              // Clear stored auth state
+              localStorage.removeItem("token");
+              localStorage.removeItem("user");
+              if (mounted) setUser(null);
+              // Redirect to login page
+              if (typeof window !== "undefined") {
+                window.location.href = "/";
+              }
+            } else {
+              console.error("Failed to refresh user from API:", err);
+              // Clear stored auth state on any failure to keep UI consistent
+              localStorage.removeItem("token");
+              localStorage.removeItem("user");
+              if (mounted) setUser(null);
+            }
           }
         }
       } catch (err) {
@@ -68,8 +88,10 @@ export function AuthProvider({ children }) {
     const userToStore = userData?.user || userData;
     localStorage.setItem("user", JSON.stringify(userToStore));
     setUser(userToStore);
-    // Force re-render by triggering a state change
-    window.dispatchEvent(new Event("storage"));
+    // Dispatch custom event for same-window components to detect auth change
+    window.dispatchEvent(
+      new CustomEvent("auth-update", { detail: userToStore }),
+    );
   };
 
   const logout = () => {
