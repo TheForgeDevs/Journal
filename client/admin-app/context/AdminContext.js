@@ -34,14 +34,18 @@ export const AdminProvider = ({ children }) => {
 
     try {
       const response = await authAPI.getProfile();
-      if (response.data.data.user.role === "admin") {
+      if (response.data && response.data.data && response.data.data.user) {
         setAdmin(response.data.data.user);
       } else {
-        Cookies.remove("admin_token");
-        toast.error("Unauthorized access");
+        console.error("Invalid response structure");
+        Cookies.remove("admin_token", { path: "/" });
       }
     } catch (error) {
-      Cookies.remove("admin_token");
+      console.error("Auth check failed:", error.response?.status);
+      // Only remove token on 401 (unauthorized) or 403 (forbidden)
+      if (error.response?.status === 401 || error.response?.status === 403) {
+        Cookies.remove("admin_token", { path: "/" });
+      }
     } finally {
       setLoading(false);
     }
@@ -57,7 +61,12 @@ export const AdminProvider = ({ children }) => {
         return false;
       }
 
-      Cookies.set("admin_token", token, { expires: 7 });
+      // Set cookie with 12 hours expiry (0.5 days)
+      Cookies.set("admin_token", token, {
+        expires: 0.5,
+        path: "/",
+        sameSite: "strict",
+      });
       setAdmin(data.user);
       toast.success("Login successful");
       router.push("/dashboard");
@@ -69,7 +78,7 @@ export const AdminProvider = ({ children }) => {
   };
 
   const logout = () => {
-    Cookies.remove("admin_token");
+    Cookies.remove("admin_token", { path: "/" });
     setAdmin(null);
     router.push("/login");
     toast.success("Logged out successfully");
