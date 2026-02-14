@@ -46,6 +46,8 @@ export const register = catchAsync(async (req, res, next) => {
         email: user.email,
         role: user.role,
         avatar: user.avatar,
+        phone: user.phone,
+        bio: user.bio,
       },
     },
   });
@@ -85,6 +87,8 @@ export const login = catchAsync(async (req, res, next) => {
         email: user.email,
         role: user.role,
         avatar: user.avatar,
+        phone: user.phone,
+        bio: user.bio,
       },
     },
   });
@@ -363,5 +367,42 @@ export const getTutorProfile = catchAsync(async (req, res, next) => {
         courses: coursesWithStats || [],
       },
     },
+  });
+});
+
+// @desc    Delete user account
+// @route   DELETE /api/auth/delete-account
+// @access  Private
+export const deleteAccount = catchAsync(async (req, res, next) => {
+  const { password } = req.body;
+
+  if (!password) {
+    return next(new AppError("Please provide your password to confirm deletion", 400));
+  }
+
+  // Get user with password
+  const user = await User.findById(req.user._id).select("+password");
+
+  if (!user || !(await user.comparePassword(password))) {
+    return next(new AppError("Incorrect password", 401));
+  }
+
+  // Delete user avatar from Cloudinary if present
+  if (user.avatarPublicId) {
+    try {
+      await deleteFromCloudinary(user.avatarPublicId, "image");
+    } catch (err) {
+      logger.error("Failed to delete avatar from Cloudinary:", err);
+      // Continue with account deletion
+    }
+  }
+
+  // Mark user as inactive instead of completely deleting
+  user.isActive = false;
+  await user.save();
+
+  res.status(200).json({
+    success: true,
+    message: "Account deleted successfully",
   });
 });

@@ -3,7 +3,7 @@ import MobileTabBar from './MobileTabBar';
 
 export default function TutorLayout({ children }) {
   return (
-    <div className="flex min-h-screen bg-gray-50">
+    <div className="flex min-h-screen ">
       {/* Desktop Sidebar - Only visible on large screens */}
       <div className="hidden lg:block sticky top-0 left-0 h-screen">
         <TutorSidebar />
