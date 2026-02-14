@@ -85,11 +85,10 @@ export const getPublicReviews = catchAsync(async (req, res) => {
 // @route   GET /api/stats/admin-dashboard
 // @access  Private/Admin
 export const getAdminDashboardStats = catchAsync(async (req, res) => {
-  // Count users by role
+  // Count users by role (excluding admins as they're in separate collection)
   const totalUsers = await User.countDocuments();
   const studentCount = await User.countDocuments({ role: "student" });
   const tutorCount = await User.countDocuments({ role: "tutor" });
-  const adminCount = await User.countDocuments({ role: "admin" });
 
   // Count courses
   const totalCourses = await Course.countDocuments();
@@ -131,7 +130,6 @@ export const getAdminDashboardStats = catchAsync(async (req, res) => {
       totalUsers,
       studentCount,
       tutorCount,
-      adminCount,
       totalCourses,
       publishedCourses,
       draftCourses,
