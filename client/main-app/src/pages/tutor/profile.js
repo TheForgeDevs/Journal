@@ -24,7 +24,7 @@ import toast, { Toaster } from "react-hot-toast";
 import Image from "next/image";
 
 export default function TutorProfile() {
-  const { user, refreshUser, logout } = useAuth();
+  const { user, refreshUser, logout, loading: authLoading } = useAuth();
   const router = useRouter();
 
   const [formData, setFormData] = useState({
@@ -45,6 +45,18 @@ export default function TutorProfile() {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deletePassword, setDeletePassword] = useState("");
   const [deletingAccount, setDeletingAccount] = useState(false);
+
+  // Sync user data to form
+  useEffect(() => {
+    // Authentication check and redirect
+    if (!authLoading) {
+      if (!user) {
+        router.push("/auth/tutor?tab=login");
+      } else if (user.role !== "tutor") {
+        router.push(`/${user.role}/dashboard`);
+      }
+    }
+  }, [user, authLoading, router]);
 
   // Sync user data to form
   useEffect(() => {
@@ -170,6 +182,20 @@ export default function TutorProfile() {
     }
   };
 
+  // Show loading while auth state is being determined
+  if (authLoading) {
+    return (
+      <TutorLayout>
+        <div className="flex h-[80vh] items-center justify-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-600"></div>
+        </div>
+      </TutorLayout>
+    );
+  }
+
+  // Redirect handled by useEffect, return null if not authenticated
+  if (!user || user.role !== "tutor") return null;
+
   return (
     <TutorLayout>
       <Toaster position="top-right" />
@@ -185,9 +211,9 @@ export default function TutorProfile() {
         </div>
 
         {/* --- Profile Header & Avatar --- */}
-        <div className="bg-white p-8 rounded-4xl shadow-sm border border-gray-100 flex flex-col md:flex-row items-center gap-8">
+        <div className="bg-linear-to-br from-[#1E1E2E] to-[#2B2B40] p-8 rounded-4xl shadow-sm border border-gray-800/50 flex flex-col md:flex-row items-center gap-8">
           <div className="relative group">
-            <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-white shadow-lg ring-4 ring-purple-50">
+            <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-purple-600 shadow-lg ring-4 ring-purple-500/20">
               <Image
                 src={user?.avatar || "/images/default-user.svg"}
                 alt="Profile"
@@ -215,11 +241,11 @@ export default function TutorProfile() {
           </div>
 
           <div className="text-center md:text-left">
-            <h2 className="text-2xl font-bold text-gray-900">{user?.name}</h2>
-            <span className="inline-block mt-1 px-3 py-1 bg-purple-100 text-purple-700 text-xs font-bold rounded-full uppercase tracking-wider">
+            <h2 className="text-2xl font-bold text-white">{user?.name}</h2>
+            <span className="inline-block mt-1 px-3 py-1 bg-purple-600/20 text-purple-400 text-xs font-bold rounded-full uppercase tracking-wider border border-purple-500/50">
               {user?.role || "Tutor"}
             </span>
-            <p className="text-gray-500 mt-3 text-sm max-w-md">
+            <p className="text-gray-400 mt-3 text-sm max-w-md">
               Update your photo and personal details here. This information will
               be displayed on your public tutor profile.
             </p>
@@ -228,28 +254,28 @@ export default function TutorProfile() {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* --- Edit Details Form --- */}
-          <div className="bg-white p-8 rounded-4xl shadow-sm border border-gray-100">
-            <div className="flex items-center gap-2 mb-6 border-b border-gray-100 pb-4">
-              <FiUser className="text-purple-600" size={20} />
-              <h3 className="text-lg font-bold text-gray-900">
+          <div className="bg-linear-to-br from-[#1E1E2E] to-[#2B2B40] p-8 rounded-4xl shadow-sm border border-gray-800/50">
+            <div className="flex items-center gap-2 mb-6 border-b border-gray-800/50 pb-4">
+              <FiUser className="text-purple-400" size={20} />
+              <h3 className="text-lg font-bold text-white">
                 Personal Information
               </h3>
             </div>
 
             <form onSubmit={handleUpdateProfile} className="space-y-5">
               <div>
-                <label className="block text-sm font-bold text-gray-700 mb-2">
-                  Full Name
+                <label className="block text-sm font-bold text-white mb-2">
+                  Email
                 </label>
                 <div className="relative">
-                  <FiUser className="absolute left-4 top-3.5 text-gray-400" />
+                  <FiMail className="absolute left-4 top-3.5 text-gray-400" />
                   <input
-                    type="text"
-                    value={formData.name}
+                    type="email"
+                    value={formData.email}
                     onChange={(e) =>
-                      setFormData({ ...formData, name: e.target.value })
+                      setFormData({ ...formData, email: e.target.value })
                     }
-                    className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 outline-none transition font-medium text-gray-900 bg-white"
+                    className="w-full pl-10 pr-4 py-3 border border-gray-700/50 rounded-xl focus:ring-2 focus:ring-purple-500 outline-none transition font-medium text-white bg-[#1E1E2E]"
                   />
                 </div>
               </div>

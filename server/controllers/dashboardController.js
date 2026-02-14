@@ -26,7 +26,10 @@ export const getDashboardStats = catchAsync(async (req, res) => {
     const payments = await Payment.find({
       course: { $in: courseIds },
       status: "completed",
-    });
+    })
+    .sort({ createdAt: -1 })
+    .populate('student', 'name email')
+    .populate('course', 'title');
     const totalRevenue = payments.reduce((acc, curr) => acc + curr.amount, 0);
 
     // 3. Revenue Graph Data (Last 6 Months)
