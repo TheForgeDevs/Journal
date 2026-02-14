@@ -4,7 +4,7 @@ import {
   getPublicReviews,
   getAdminDashboardStats,
 } from "../controllers/statsController.js";
-import { protect, restrictTo } from "../middleware/auth.js";
+import { protectAdmin } from "../middleware/auth.js";
 
 const router = express.Router();
 
@@ -13,11 +13,6 @@ router.get("/platform", getPlatformStats);
 router.get("/reviews", getPublicReviews);
 
 // Admin routes
-router.get(
-  "/admin-dashboard",
-  protect,
-  restrictTo("admin"),
-  getAdminDashboardStats,
-);
+router.get("/admin-dashboard", protectAdmin, getAdminDashboardStats);
 
 export default router;
