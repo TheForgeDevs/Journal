@@ -16,7 +16,7 @@ import {
   deleteUser,
   toggleUserStatus,
 } from "../controllers/authController.js";
-import { protect, restrictTo } from "../middleware/auth.js";
+import { protect, restrictTo, protectAdmin } from "../middleware/auth.js";
 import { validateRegister, validateLogin } from "../middleware/validate.js";
 import { thumbnailUpload } from "../config/cloudinary.js";
 import dotenv from "dotenv";
@@ -39,12 +39,11 @@ router.get("/me", getMe);
 router.post("/change-password", changePasswordAuth);
 router.patch("/update-profile", updateProfile);
 
-// Admin routes
-router.get("/users", restrictTo("admin"), getAllUsers);
-router.get("/users/:id", restrictTo("admin"), getUserById);
-router.put("/users/:id", restrictTo("admin"), updateUser);
-router.delete("/users/:id", restrictTo("admin"), deleteUser);
-router.patch("/users/:id/toggle-status", restrictTo("admin"), toggleUserStatus);
+// Admin routes - use protectAdmin middleware
+router.get("/users", protectAdmin, getAllUsers);
+router.put("/users/:id", protectAdmin, updateUser);
+router.delete("/users/:id", protectAdmin, deleteUser);
+router.patch("/users/:id/toggle-status", protectAdmin, toggleUserStatus);
 
 // Upload avatar: if Cloudinary keys are missing, return 503 with clear message
 const cloudinaryConfigured =
