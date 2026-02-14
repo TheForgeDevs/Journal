@@ -103,9 +103,9 @@ export default function DashboardPage() {
               </span>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-gray-600">Admins</span>
+              <span className="text-gray-600">Total Users</span>
               <span className="font-bold text-purple-600">
-                {stats?.adminCount || 0}
+                {stats?.totalUsers || 0}
               </span>
             </div>
           </div>
