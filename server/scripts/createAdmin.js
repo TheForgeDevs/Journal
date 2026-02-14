@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import dotenv from "dotenv";
-import User from "../models/User.js";
+import Admin from "../models/Admin.js";
 import connectDB from "../config/db.js";
 
 dotenv.config();
@@ -10,7 +10,7 @@ const createAdminUser = async () => {
     await connectDB();
 
     // Check if admin already exists
-    const existingAdmin = await User.findOne({ role: "admin" });
+    const existingAdmin = await Admin.findOne({});
 
     if (existingAdmin) {
       console.log("Admin user already exists:");
@@ -21,16 +21,15 @@ const createAdminUser = async () => {
       process.exit(0);
     }
 
-    // Prompt for admin details
+    // Create admin with default credentials
     const adminData = {
       name: "Admin",
       email: "admin@example.com",
       password: "admin123", // Change this to a secure password
-      role: "admin",
       isActive: true,
     };
 
-    const admin = await User.create(adminData);
+    const admin = await Admin.create(adminData);
 
     console.log("✅ Admin user created successfully!");
     console.log("\nAdmin Credentials:");
