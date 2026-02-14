@@ -372,15 +372,15 @@ export const getTutorProfile = catchAsync(async (req, res, next) => {
 
 // ADMIN ENDPOINTS
 
-// @desc    Get all users (Admin only)
+// @desc    Get all users (Admin only) - Excludes admin role users
 // @route   GET /api/auth/users
 // @access  Private/Admin
 export const getAllUsers = catchAsync(async (req, res, next) => {
   const { role, search, page = 1, limit = 50 } = req.query;
 
-  const query = {};
+  const query = { role: { $ne: "admin" } }; // Exclude admin users
 
-  if (role) {
+  if (role && role !== "admin") {
     query.role = role;
   }
 
@@ -468,11 +468,6 @@ export const deleteUser = catchAsync(async (req, res, next) => {
 
   if (!user) {
     return next(new AppError("User not found", 404));
-  }
-
-  // Prevent deleting admin users
-  if (user.role === "admin") {
-    return next(new AppError("Cannot delete admin users", 403));
   }
 
   await user.deleteOne();
