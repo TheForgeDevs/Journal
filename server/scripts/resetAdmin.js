@@ -16,7 +16,7 @@ const resetAdminUser = async () => {
     // Create new admin
     const adminData = {
       name: "Admin",
-      email: "admin@example.com",
+      email: "admin@gmail.com",
       password: "admin123",
       isActive: true,
     };

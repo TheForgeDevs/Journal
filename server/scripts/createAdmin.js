@@ -24,7 +24,7 @@ const createAdminUser = async () => {
     // Create admin with default credentials
     const adminData = {
       name: "Admin",
-      email: "admin@example.com",
+      email: "admin@gmail.com",
       password: "admin123", // Change this to a secure password
       isActive: true,
     };
