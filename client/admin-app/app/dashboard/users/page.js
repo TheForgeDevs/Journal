@@ -97,16 +97,6 @@ export default function UsersPage() {
             >
               Tutors
             </button>
-            <button
-              onClick={() => setFilter("admin")}
-              className={`px-4 py-2 rounded-lg transition ${
-                filter === "admin"
-                  ? "bg-blue-600 text-white"
-                  : "bg-gray-200 text-gray-700"
-              }`}
-            >
-              Admins
-            </button>
           </div>
 
           <input
