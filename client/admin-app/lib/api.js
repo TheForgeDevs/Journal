@@ -29,7 +29,7 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      Cookies.remove("admin_token");
+      Cookies.remove("admin_token", { path: "/" });
       if (typeof window !== "undefined") {
         window.location.href = "/login";
       }
@@ -40,9 +40,8 @@ api.interceptors.response.use(
 
 // Auth APIs
 export const authAPI = {
-  login: (email, password) =>
-    api.post("/auth/login", { email, password, role: "admin" }),
-  getProfile: () => api.get("/auth/me"),
+  login: (email, password) => api.post("/admin/login", { email, password }),
+  getProfile: () => api.get("/admin/me"),
 };
 
 // Users APIs
