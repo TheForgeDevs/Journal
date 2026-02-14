@@ -1,0 +1,95 @@
+import axios from "axios";
+import Cookies from "js-cookie";
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
+
+const api = axios.create({
+  baseURL: API_URL,
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
+
+// Add token to requests
+api.interceptors.request.use(
+  (config) => {
+    const token = Cookies.get("admin_token");
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  },
+);
+
+// Handle response errors
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      Cookies.remove("admin_token");
+      if (typeof window !== "undefined") {
+        window.location.href = "/login";
+      }
+    }
+    return Promise.reject(error);
+  },
+);
+
+// Auth APIs
+export const authAPI = {
+  login: (email, password) =>
+    api.post("/auth/login", { email, password, role: "admin" }),
+  getProfile: () => api.get("/auth/me"),
+};
+
+// Users APIs
+export const usersAPI = {
+  getAll: (params) => api.get("/auth/users", { params }),
+  getById: (id) => api.get(`/auth/users/${id}`),
+  update: (id, data) => api.put(`/auth/users/${id}`, data),
+  delete: (id) => api.delete(`/auth/users/${id}`),
+  toggleStatus: (id) => api.patch(`/auth/users/${id}/toggle-status`),
+};
+
+// Courses APIs
+export const coursesAPI = {
+  getAll: (params) => api.get("/courses", { params }),
+  getById: (id) => api.get(`/courses/${id}`),
+  create: (data) => api.post("/courses", data),
+  update: (id, data) => api.put(`/courses/${id}`, data),
+  delete: (id) => api.delete(`/courses/${id}`),
+  togglePublish: (id) => api.patch(`/courses/${id}/publish`),
+};
+
+// Enrollments APIs
+export const enrollmentsAPI = {
+  getAll: (params) => api.get("/enrollments", { params }),
+  getById: (id) => api.get(`/enrollments/${id}`),
+  delete: (id) => api.delete(`/enrollments/${id}`),
+};
+
+// Payments APIs
+export const paymentsAPI = {
+  getAll: (params) => api.get("/payments", { params }),
+  getById: (id) => api.get(`/payments/${id}`),
+  updateStatus: (id, status) => api.patch(`/payments/${id}/status`, { status }),
+};
+
+// Reviews APIs
+export const reviewsAPI = {
+  getAll: (params) => api.get("/reviews", { params }),
+  delete: (id) => api.delete(`/reviews/${id}`),
+};
+
+// Stats APIs
+export const statsAPI = {
+  getDashboard: () => api.get("/stats/admin-dashboard"),
+  getRevenue: (period) => api.get("/stats/revenue", { params: { period } }),
+  getUserGrowth: (period) =>
+    api.get("/stats/user-growth", { params: { period } }),
+};
+
+export default api;
