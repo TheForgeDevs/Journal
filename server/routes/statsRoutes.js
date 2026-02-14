@@ -1,10 +1,23 @@
 import express from "express";
-import { getPlatformStats, getPublicReviews } from "../controllers/statsController.js";
+import {
+  getPlatformStats,
+  getPublicReviews,
+  getAdminDashboardStats,
+} from "../controllers/statsController.js";
+import { protect, restrictTo } from "../middleware/auth.js";
 
 const router = express.Router();
 
 // Public routes - no authentication required
 router.get("/platform", getPlatformStats);
 router.get("/reviews", getPublicReviews);
+
+// Admin routes
+router.get(
+  "/admin-dashboard",
+  protect,
+  restrictTo("admin"),
+  getAdminDashboardStats,
+);
 
 export default router;
