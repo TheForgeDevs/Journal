@@ -10,6 +10,7 @@ import {
   updateProfile,
   uploadAvatar,
   getTutorProfile,
+  deleteAccount,
 } from "../controllers/authController.js";
 import { protect } from "../middleware/auth.js";
 import { validateRegister, validateLogin } from "../middleware/validate.js";
@@ -33,6 +34,7 @@ router.post("/logout", logout);
 router.get("/me", getMe);
 router.post("/change-password", changePasswordAuth);
 router.patch("/update-profile", updateProfile);
+router.delete("/delete-account", deleteAccount);
 // Upload avatar: if Cloudinary keys are missing, return 503 with clear message
 const cloudinaryConfigured =
   process.env.CLOUDINARY_CLOUD_NAME &&

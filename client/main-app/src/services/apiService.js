@@ -18,6 +18,7 @@ export const resetPassword = (token, data) =>
   API.post(`/auth/reset-password/${token}`, data);
 export const changePassword = (data) => API.post("/auth/change-password", data);
 export const updateProfile = (data) => API.patch("/auth/update-profile", data);
+export const deleteAccount = (data) => API.delete("/auth/delete-account", { data });
 
 export const getMe = () => API.get("/auth/me");
 

@@ -17,7 +17,7 @@ export default function TutorSidebar() {
   const { user } = useAuth();
 
   return (
-    <div className="w-64 lg:w-68 bg-white h-screen border-r border-gray-100 p-6 flex flex-col overflow-y-auto">
+    <div className="w-64 lg:w-68 p-6 flex flex-col overflow-y-auto">
       
       {/* Header with Logo/Branding */}
       <div className="mb-8">

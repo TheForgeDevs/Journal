@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useRouter } from "next/router";
 import TutorLayout from "../../components/tutor/TutorLayout";
 import { useAuth } from "../../context/AuthContext";
 // IMPORT API SERVICES
@@ -6,6 +7,7 @@ import {
   updateProfile,
   changePassword,
   uploadAvatar,
+  deleteAccount,
 } from "../../services/apiService";
 import {
   FiCamera,
@@ -15,12 +17,15 @@ import {
   FiMail,
   FiPhone,
   FiFileText,
+  FiEye,
+  FiEyeOff,
 } from "react-icons/fi";
 import toast, { Toaster } from "react-hot-toast";
 import Image from "next/image";
 
 export default function TutorProfile() {
-  const { user, refreshUser } = useAuth();
+  const { user, refreshUser, logout } = useAuth();
+  const router = useRouter();
 
   const [formData, setFormData] = useState({
     name: "",
@@ -35,6 +40,11 @@ export default function TutorProfile() {
   });
   const [loading, setLoading] = useState(false);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const [showOldPassword, setShowOldPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deletePassword, setDeletePassword] = useState("");
+  const [deletingAccount, setDeletingAccount] = useState(false);
 
   // Sync user data to form
   useEffect(() => {
@@ -47,6 +57,20 @@ export default function TutorProfile() {
       });
     }
   }, [user]);
+
+  // Lock scroll when modal is open
+  useEffect(() => {
+    if (showDeleteModal) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "auto";
+    }
+
+    return () => {
+      document.body.style.overflow = "auto";
+    };
+  }, [showDeleteModal]);
+
 
   // 1. Update Basic Info
   const handleUpdateProfile = async (e) => {
@@ -105,12 +129,44 @@ export default function TutorProfile() {
     }
 
     try {
+      setLoading(true);
       await changePassword(passData); // Using API service
       toast.success("Password changed successfully");
       setPassData({ oldPassword: "", newPassword: "" });
+      
+      // Refresh user to update token if needed
+      await refreshUser();
     } catch (err) {
       console.error(err);
       toast.error(err.response?.data?.message || "Password change failed");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // 4. Delete Account
+  const handleDeleteAccount = async (e) => {
+    e.preventDefault();
+    if (!deletePassword) {
+      toast.error("Please enter your password to confirm deletion");
+      return;
+    }
+
+    try {
+      setDeletingAccount(true);
+      await deleteAccount({ password: deletePassword });
+      toast.success("Account deleted successfully");
+      setShowDeleteModal(false);
+      
+      // Clear auth and redirect
+      logout();
+      router.push("/");
+    } catch (err) {
+      console.error(err);
+      toast.error(err.response?.data?.message || "Failed to delete account");
+      setDeletePassword("");
+    } finally {
+      setDeletingAccount(false);
     }
   };
 
@@ -278,35 +334,60 @@ export default function TutorProfile() {
                 <label className="block text-sm font-bold text-gray-700 mb-2">
                   Current Password
                 </label>
-                <input
-                  type="password"
-                  value={passData.oldPassword}
-                  onChange={(e) =>
-                    setPassData({ ...passData, oldPassword: e.target.value })
-                  }
-                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 outline-none transition font-medium text-gray-900 bg-white"
-                  placeholder="••••••••"
-                />
+                <div className="relative">
+                  <input
+                    type={showOldPassword ? "text" : "password"}
+                    value={passData.oldPassword}
+                    onChange={(e) =>
+                      setPassData({ ...passData, oldPassword: e.target.value })
+                    }
+                    className="w-full px-4 py-3 pr-12 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 outline-none transition font-medium text-gray-900 bg-white"
+                    placeholder="••••••••"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowOldPassword(!showOldPassword)}
+                    className="absolute right-4 top-3.5 text-gray-500 hover:text-gray-700 transition"
+                  >
+                    {showOldPassword ? <FiEyeOff size={20} /> : <FiEye size={20} />}
+                  </button>
+                </div>
               </div>
               <div>
                 <label className="block text-sm font-bold text-gray-700 mb-2">
                   New Password
                 </label>
-                <input
-                  type="password"
-                  value={passData.newPassword}
-                  onChange={(e) =>
-                    setPassData({ ...passData, newPassword: e.target.value })
-                  }
-                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 outline-none transition font-medium text-gray-900 bg-white"
-                  placeholder="••••••••"
-                />
+                <div className="relative">
+                  <input
+                    type={showNewPassword ? "text" : "password"}
+                    value={passData.newPassword}
+                    onChange={(e) =>
+                      setPassData({ ...passData, newPassword: e.target.value })
+                    }
+                    className="w-full px-4 py-3 pr-12 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 outline-none transition font-medium text-gray-900 bg-white"
+                    placeholder="••••••••"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowNewPassword(!showNewPassword)}
+                    className="absolute right-4 top-3.5 text-gray-500 hover:text-gray-700 transition"
+                  >
+                    {showNewPassword ? <FiEyeOff size={20} /> : <FiEye size={20} />}
+                  </button>
+                </div>
               </div>
               <button
                 type="submit"
-                className="w-full bg-gray-900 text-white py-3.5 rounded-xl font-bold hover:bg-black transition flex items-center justify-center gap-2"
+                disabled={loading}
+                className="w-full bg-gray-900 text-white py-3.5 rounded-xl font-bold hover:bg-black transition flex items-center justify-center gap-2 disabled:opacity-70"
               >
-                Update Password
+                {loading ? (
+                  <span className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"></span>
+                ) : (
+                  <>
+                    <FiLock size={18} /> Update Password
+                  </>
+                )}
               </button>
             </form>
 
@@ -318,10 +399,60 @@ export default function TutorProfile() {
                 Once you delete your account, there is no going back. Please be
                 certain.
               </p>
-              <button className="text-red-600 text-xs font-bold hover:underline">
+              <button
+                type="button"
+                onClick={() => setShowDeleteModal(true)}
+                className="text-red-600 text-xs font-bold hover:underline transition"
+              >
                 Delete Account
               </button>
             </div>
+
+            {/* Delete Account Modal */}
+            {showDeleteModal && (
+              <div className="fixed inset-0 bg-black/50 backdrop-blur-md flex items-center justify-center z-50 p-4">
+                <div className="bg-white rounded-2xl shadow-xl max-w-md w-full p-6">
+                  <h3 className="text-lg font-bold text-gray-900 mb-2">Delete Account?</h3>
+                  <p className="text-gray-600 text-sm mb-4">
+                    This action is permanent. All your data will be deleted. Please enter your password to confirm.
+                  </p>
+                  <form onSubmit={handleDeleteAccount} className="space-y-4">
+                    <input
+                      type="password"
+                      value={deletePassword}
+                      onChange={(e) => setDeletePassword(e.target.value)}
+                      placeholder="Enter your password"
+                      className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-red-500 outline-none text-sm"
+                      disabled={deletingAccount}
+                    />
+                    <div className="flex gap-3">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setShowDeleteModal(false);
+                          setDeletePassword("");
+                        }}
+                        disabled={deletingAccount}
+                        className="flex-1 px-4 py-2.5 border border-gray-200 rounded-lg text-sm font-bold text-gray-700 hover:bg-gray-50 transition disabled:opacity-50"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        type="submit"
+                        disabled={deletingAccount}
+                        className="flex-1 px-4 py-2.5 bg-red-600 text-white rounded-lg text-sm font-bold hover:bg-red-700 transition disabled:opacity-50 flex items-center justify-center gap-2"
+                      >
+                        {deletingAccount ? (
+                          <span className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></span>
+                        ) : (
+                          "Delete"
+                        )}
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
