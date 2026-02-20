@@ -65,22 +65,23 @@ export const coursesAPI = {
 
 // Enrollments APIs
 export const enrollmentsAPI = {
-  getAll: (params) => api.get("/enrollments", { params }),
-  getById: (id) => api.get(`/enrollments/${id}`),
-  delete: (id) => api.delete(`/enrollments/${id}`),
+  getAll: (params) => api.get("/admin/enrollments", { params }),
+  getById: (id) => api.get(`/admin/enrollments/${id}`),
+  delete: (id) => api.delete(`/admin/enrollments/${id}`),
 };
 
 // Payments APIs
 export const paymentsAPI = {
-  getAll: (params) => api.get("/payments", { params }),
-  getById: (id) => api.get(`/payments/${id}`),
-  updateStatus: (id, status) => api.patch(`/payments/${id}/status`, { status }),
+  getAll: (params) => api.get("/admin/payments", { params }),
+  getById: (id) => api.get(`/admin/payments/${id}`),
+  updateStatus: (id, status) =>
+    api.patch(`/admin/payments/${id}/status`, { status }),
 };
 
 // Reviews APIs
 export const reviewsAPI = {
-  getAll: (params) => api.get("/reviews", { params }),
-  delete: (id) => api.delete(`/reviews/${id}`),
+  getAll: (params) => api.get("/reviews/admin/all", { params }),
+  delete: (id) => api.delete(`/reviews/admin/${id}`),
 };
 
 // Stats APIs
@@ -89,6 +90,8 @@ export const statsAPI = {
   getRevenue: (period) => api.get("/stats/revenue", { params: { period } }),
   getUserGrowth: (period) =>
     api.get("/stats/user-growth", { params: { period } }),
+  getPaymentAnalytics: (year) =>
+    api.get("/stats/payment-analytics", { params: { year } }),
 };
 
 export default api;
