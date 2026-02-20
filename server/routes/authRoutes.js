@@ -10,9 +10,13 @@ import {
   updateProfile,
   uploadAvatar,
   getTutorProfile,
-  deleteAccount,
+  getAllUsers,
+  getUserById,
+  updateUser,
+  deleteUser,
+  toggleUserStatus,
 } from "../controllers/authController.js";
-import { protect } from "../middleware/auth.js";
+import { protect, restrictTo, protectAdmin } from "../middleware/auth.js";
 import { validateRegister, validateLogin } from "../middleware/validate.js";
 import { thumbnailUpload } from "../config/cloudinary.js";
 import dotenv from "dotenv";
@@ -34,7 +38,13 @@ router.post("/logout", logout);
 router.get("/me", getMe);
 router.post("/change-password", changePasswordAuth);
 router.patch("/update-profile", updateProfile);
-router.delete("/delete-account", deleteAccount);
+
+// Admin routes - use protectAdmin middleware
+router.get("/users", protectAdmin, getAllUsers);
+router.put("/users/:id", protectAdmin, updateUser);
+router.delete("/users/:id", protectAdmin, deleteUser);
+router.patch("/users/:id/toggle-status", protectAdmin, toggleUserStatus);
+
 // Upload avatar: if Cloudinary keys are missing, return 503 with clear message
 const cloudinaryConfigured =
   process.env.CLOUDINARY_CLOUD_NAME &&

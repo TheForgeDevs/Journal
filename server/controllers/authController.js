@@ -60,14 +60,18 @@ export const login = catchAsync(async (req, res, next) => {
   const { email, password, role } = req.body;
 
   // Validate input
-  if (!email || !password || !role) {
-    return next(new AppError("Please provide email, password and role", 400));
+  if (!email || !password) {
+    return next(new AppError("Please provide email and password", 400));
+  }
+
+  // Build query - if role is provided, use it; otherwise search all roles
+  const query = { email, isActive: true };
+  if (role) {
+    query.role = role;
   }
 
   // Find user and include password
-  const user = await User.findOne({ email, role, isActive: true }).select(
-    "+password",
-  );
+  const user = await User.findOne(query).select("+password");
 
   if (!user || !(await user.comparePassword(password))) {
     return next(new AppError("Invalid credentials", 401));
@@ -370,39 +374,130 @@ export const getTutorProfile = catchAsync(async (req, res, next) => {
   });
 });
 
-// @desc    Delete user account
-// @route   DELETE /api/auth/delete-account
-// @access  Private
-export const deleteAccount = catchAsync(async (req, res, next) => {
-  const { password } = req.body;
+// ADMIN ENDPOINTS
 
-  if (!password) {
-    return next(new AppError("Please provide your password to confirm deletion", 400));
+// @desc    Get all users (Admin only) - Excludes admin role users
+// @route   GET /api/auth/users
+// @access  Private/Admin
+export const getAllUsers = catchAsync(async (req, res, next) => {
+  const { role, search, page = 1, limit = 50 } = req.query;
+
+  const query = { role: { $ne: "admin" } }; // Exclude admin users
+
+  if (role && role !== "admin") {
+    query.role = role;
   }
 
-  // Get user with password
-  const user = await User.findById(req.user._id).select("+password");
-
-  if (!user || !(await user.comparePassword(password))) {
-    return next(new AppError("Incorrect password", 401));
+  if (search) {
+    query.$or = [
+      { name: { $regex: search, $options: "i" } },
+      { email: { $regex: search, $options: "i" } },
+    ];
   }
 
-  // Delete user avatar from Cloudinary if present
-  if (user.avatarPublicId) {
-    try {
-      await deleteFromCloudinary(user.avatarPublicId, "image");
-    } catch (err) {
-      logger.error("Failed to delete avatar from Cloudinary:", err);
-      // Continue with account deletion
+  const users = await User.find(query)
+    .select("-password -resetPasswordToken -resetPasswordExpire")
+    .sort("-createdAt")
+    .limit(limit * 1)
+    .skip((page - 1) * limit);
+
+  const total = await User.countDocuments(query);
+
+  res.status(200).json({
+    success: true,
+    data: {
+      users,
+      pagination: {
+        page: parseInt(page),
+        limit: parseInt(limit),
+        total,
+        pages: Math.ceil(total / limit),
+      },
+    },
+  });
+});
+
+// @desc    Get single user (Admin only)
+// @route   GET /api/auth/users/:id
+// @access  Private/Admin
+export const getUserById = catchAsync(async (req, res, next) => {
+  const user = await User.findById(req.params.id).select(
+    "-password -resetPasswordToken -resetPasswordExpire",
+  );
+
+  if (!user) {
+    return next(new AppError("User not found", 404));
+  }
+
+  res.status(200).json({
+    success: true,
+    data: { user },
+  });
+});
+
+// @desc    Update user (Admin only)
+// @route   PUT /api/auth/users/:id
+// @access  Private/Admin
+export const updateUser = catchAsync(async (req, res, next) => {
+  const allowedFields = ["name", "email", "phone", "bio", "role", "isActive"];
+  const updates = {};
+
+  allowedFields.forEach((field) => {
+    if (req.body[field] !== undefined) {
+      updates[field] = req.body[field];
     }
+  });
+
+  const user = await User.findByIdAndUpdate(req.params.id, updates, {
+    new: true,
+    runValidators: true,
+  }).select("-password");
+
+  if (!user) {
+    return next(new AppError("User not found", 404));
   }
 
-  // Mark user as inactive instead of completely deleting
-  user.isActive = false;
+  res.status(200).json({
+    success: true,
+    data: { user },
+    message: "User updated successfully",
+  });
+});
+
+// @desc    Delete user (Admin only)
+// @route   DELETE /api/auth/users/:id
+// @access  Private/Admin
+export const deleteUser = catchAsync(async (req, res, next) => {
+  const user = await User.findById(req.params.id);
+
+  if (!user) {
+    return next(new AppError("User not found", 404));
+  }
+
+  await user.deleteOne();
+
+  res.status(200).json({
+    success: true,
+    message: "User deleted successfully",
+  });
+});
+
+// @desc    Toggle user active status (Admin only)
+// @route   PATCH /api/auth/users/:id/toggle-status
+// @access  Private/Admin
+export const toggleUserStatus = catchAsync(async (req, res, next) => {
+  const user = await User.findById(req.params.id);
+
+  if (!user) {
+    return next(new AppError("User not found", 404));
+  }
+
+  user.isActive = !user.isActive;
   await user.save();
 
   res.status(200).json({
     success: true,
-    message: "Account deleted successfully",
+    data: { user },
+    message: `User ${user.isActive ? "activated" : "deactivated"} successfully`,
   });
 });
