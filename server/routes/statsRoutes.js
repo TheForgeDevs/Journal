@@ -3,6 +3,7 @@ import {
   getPlatformStats,
   getPublicReviews,
   getAdminDashboardStats,
+  getPaymentAnalytics,
 } from "../controllers/statsController.js";
 import { protectAdmin } from "../middleware/auth.js";
 
@@ -14,5 +15,6 @@ router.get("/reviews", getPublicReviews);
 
 // Admin routes
 router.get("/admin-dashboard", protectAdmin, getAdminDashboardStats);
+router.get("/payment-analytics", protectAdmin, getPaymentAnalytics);
 
 export default router;
