@@ -14,19 +14,19 @@ const Sidebar = () => {
   const router = useRouter();
 
   const menuItems = [
-    { name: "Dashboard", icon: FiGrid, href: "/user/profile" },
-    { name: "Courses", icon: FiBookOpen, href: "/user/courses" },
-    { name: "Payments", icon: FiCreditCard, href: "/user/payments" },
-    { name: "Profile", icon: FiUser, href: "/user/public-profile" },
-    { name: "Photo", icon: FiCamera, href: "/user/photo" },
-    { name: "Account Security", icon: FiShield, href: "/user/account-security" },
-    { name: "Close Account", icon: FiXCircle, href: "/user/close-account", danger: true },
+    { name: "Dashboard", icon: FiGrid, href: "/student/profile" },
+    { name: "Courses", icon: FiBookOpen, href: "/student/courses" },
+    { name: "Payments", icon: FiCreditCard, href: "/student/payments" },
+    { name: "Profile", icon: FiUser, href: "/student/public-profile" },
+    { name: "Photo", icon: FiCamera, href: "/student/photo" },
+    { name: "Account Security", icon: FiShield, href: "/student/account-security" },
+    { name: "Close Account", icon: FiXCircle, href: "/student/close-account", danger: true },
   ];
 
   const isActive = (path) => router.asPath === path;
 
   return (
-    <aside className="sticky top-0 left-0 min-h-screen w-16 md:w-64 shrink-0 flex flex-col bg-transparent p-3 text-gray-300 transition-all duration-300 md:p-6">
+    <aside className="hidden lg:flex sticky top-0 left-0 min-h-screen w-16 md:w-64 shrink-0 flex-col bg-transparent p-3 text-gray-300 transition-all duration-300 md:p-6">
 
       <div>
         <nav className="space-y-2">
