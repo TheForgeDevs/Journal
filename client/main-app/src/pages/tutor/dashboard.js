@@ -29,6 +29,7 @@ export default function TutorDashboard() {
   });
   const [dataLoading, setDataLoading] = useState(true);
   const [showAllTransactions, setShowAllTransactions] = useState(false);
+  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
 
   // EFFECT 1: Handle Authentication & Redirection
   useEffect(() => {
@@ -47,7 +48,7 @@ export default function TutorDashboard() {
     const fetchStats = async () => {
       try {
         setDataLoading(true);
-        const res = await getDashboardStats();
+        const res = await getDashboardStats(selectedYear);
         const data = res.data.data;
         
         // Map backend graphData to monthlyData
@@ -71,8 +72,8 @@ export default function TutorDashboard() {
     if (user && user.role === "tutor") {
       fetchStats();
     }
-    // Only re-run if user ID changes (avoids loop if user object reference changes)
-  }, [user?._id, user?.role]); 
+    // Re-run when user ID or selected year changes
+  }, [user?._id, user?.role, selectedYear]); 
 
   if (loading || !user || user.role !== "tutor") return null;
 
@@ -158,22 +159,29 @@ export default function TutorDashboard() {
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-2 sm:mb-3 gap-2 sm:gap-3">
             <div>
               <h3 className="text-sm sm:text-base lg:text-lg font-black text-white group-hover:text-green-300 transition-colors duration-300">Revenue Analytics</h3>
-              <p className="text-xs text-gray-400 mt-0.5 font-medium hidden sm:block">Last 6 months</p>
+              <p className="text-xs text-gray-400 mt-0.5 font-medium hidden sm:block">{new Date().getFullYear()}</p>
             </div>
-            <select className="bg-[#2B2B40]/80 border border-gray-700/50 rounded-lg text-xs font-bold p-1.5 sm:p-2 text-gray-300 outline-none cursor-pointer w-full sm:w-auto hover:border-green-500/50 hover:bg-[#2B2B40] transition-all duration-300 focus:ring-2 focus:ring-green-500/50 backdrop-blur-sm">
-              <option>Last 6 Months</option>
-              <option>Last Year</option>
-              <option>All Time</option>
+            <select 
+              className="bg-[#2B2B40]/80 border border-gray-700/50 rounded-lg text-xs font-bold p-1.5 sm:p-2 text-gray-300 outline-none cursor-pointer w-full sm:w-auto hover:border-green-500/50 hover:bg-[#2B2B40] transition-all duration-300 focus:ring-2 focus:ring-green-500/50 backdrop-blur-sm"
+              value={selectedYear}
+              onChange={(e) => {
+                const value = e.target.value;
+                setSelectedYear(value === "all" ? "all" : parseInt(value));
+              }}
+            >
+              <option value={new Date().getFullYear()}>{new Date().getFullYear()}</option>
+              <option value={new Date().getFullYear() - 1}>{new Date().getFullYear() - 1}</option>
+              <option value="all">All Time</option>
             </select>
           </div>
-          <div className="h-32 sm:h-36 lg:h-44 w-full overflow-x-auto">
+          <div className="h-32 sm:h-36 lg:h-44 w-full">
             {dataLoading ? (
               <div className="flex items-center justify-center h-full">
                 <div className="animate-spin rounded-full h-8 w-8 border-2 border-green-600/30 border-t-green-600"></div>
               </div>
             ) : stats.monthlyData?.length > 0 ? (
               <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={stats.monthlyData} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
+                <LineChart data={stats.monthlyData} margin={{ top: 10, right: 10, left: 30, bottom: 0 }}>
                   <defs>
                     <linearGradient id="lineGradient" x1="0" y1="0" x2="1" y2="0">
                       <stop offset="0%" stopColor="#10b981"/>
@@ -193,8 +201,9 @@ export default function TutorDashboard() {
                     dataKey="name" 
                     axisLine={false} 
                     tickLine={false} 
-                    tick={{fill: '#9ca3af', fontSize: 11, fontWeight: 500}} 
-                    dy={4}
+                    tick={{fill: '#9ca3af', fontSize: 9, fontWeight: 500}} 
+                    interval={0}
+                    dy={0}
                   />
                   <YAxis hide />
                   <Tooltip 
@@ -211,7 +220,7 @@ export default function TutorDashboard() {
                   />
                   <ReferenceLine y={0} stroke="transparent" />
                   <Line 
-                    type="linear" 
+                    type="monotone" 
                     dataKey="revenue" 
                     stroke="url(#lineGradient)"
                     strokeWidth={3.5}
@@ -255,7 +264,7 @@ export default function TutorDashboard() {
                 <div className="animate-spin rounded-full h-8 w-8 border-2 border-green-600/30 border-t-green-600"></div>
               </div>
             ) : stats.recentTransactions?.length > 0 ? (
-              stats.recentTransactions.slice(0, 5).map((tx) => (
+              stats.recentTransactions.slice(0, 3).map((tx) => (
                 <div key={tx._id} className="group/item flex justify-between items-center p-2 sm:p-3 hover:bg-[#2B2B40]/60 rounded-lg transition-all cursor-pointer border border-gray-800/30 hover:border-green-500/40 duration-300">
                   <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
                     <div className="w-8 h-8 sm:w-9 sm:h-9 bg-green-600/20 rounded-lg flex items-center justify-center font-black text-green-400 group-hover/item:bg-green-600 group-hover/item:text-white transition-all duration-300 shadow-lg shrink-0 border border-green-500/50">

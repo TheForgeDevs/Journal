@@ -29,7 +29,7 @@ export const uploadAvatar = (formData) =>
   API.post("/auth/upload-avatar", formData);
 
 // Dashboard APIs
-export const getDashboardStats = () => API.get("/dashboard/stats");
+export const getDashboardStats = (year) => API.get("/dashboard/stats", { params: { year } });
 export const getEnrolledCourses = () => API.get("/dashboard/courses");
 
 // Payment APIs
