@@ -101,8 +101,13 @@ body {
 
 /* Firefox scrollbar */
 .overflow-x-auto {
-  scrollbar-width: thin;
-  scrollbar-color: rgba(168, 85, 247, 0.5) rgba(139, 92, 246, 0.1);
+  scrollbar-width: auto;
+}
+
+@supports (scrollbar-color: auto) {
+  .overflow-x-auto {
+    scrollbar-color: rgba(168, 85, 247, 0.5) rgba(139, 92, 246, 0.1);
+  }
 }
 
 /* Gradient Text */

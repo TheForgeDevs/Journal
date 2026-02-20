@@ -428,7 +428,7 @@ const DashboardHome = ({ user }) => {
                       return (
                         <div
                           key={i}
-                          className="flex-shrink-0 w-14 md:flex-1 md:max-w-25 h-full relative group flex flex-col justify-end items-center cursor-pointer transform hover:-translate-y-2 transition-all duration-300"
+                          className="shrink-0 w-14 md:flex-1 md:max-w-25 h-full relative group flex flex-col justify-end items-center cursor-pointer transform hover:-translate-y-2 transition-all duration-300"
                         >
                           {/* Percentage Badge */}
                           <div className={`absolute -top-10 md:-top-12 left-1/2 transform -translate-x-1/2 z-30 bg-linear-to-r ${styles.badge} px-2 py-1 md:px-4 md:py-2 rounded-lg md:rounded-xl border border-white/20 md:border-2 shadow-xl md:shadow-2xl ${styles.shadow} group-hover:scale-110 group-hover:-translate-y-2 transition-all duration-300`}>
@@ -461,7 +461,7 @@ const DashboardHome = ({ user }) => {
                   {/* Course Names */}
                   <div className="flex gap-3 md:gap-6 mt-6 px-6 md:px-12">
                     {coursePerformance.map((data, i) => (
-                      <div key={i} className="flex-shrink-0 w-14 md:flex-1 md:max-w-25 text-center group cursor-pointer">
+                      <div key={i} className="shrink-0 w-14 md:flex-1 md:max-w-25 text-center group cursor-pointer">
                         <div className="bg-[#2B2B40]/50 backdrop-blur-sm px-1 py-1.5 md:px-2 md:py-2 rounded-md md:rounded-lg border border-gray-700/30 group-hover:border-purple-500/50 transition-all">
                           <p className="text-[9px] md:text-xs text-gray-300 group-hover:text-purple-400 transition-colors font-bold truncate" title={data.shortName}>
                             {data.shortName}
