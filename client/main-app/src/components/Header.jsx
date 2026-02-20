@@ -134,7 +134,7 @@ export default function Header() {
         {/* --- LEFT: LOGO --- */}
         <Link href="/" className="flex items-center gap-1 group shrink-0">
           <Image
-            src="logo.png"
+            src="/logo.png"
             alt="Journal"
             width={120}
             height={40}
