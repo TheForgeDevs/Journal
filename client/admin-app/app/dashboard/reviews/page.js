@@ -40,7 +40,7 @@ export default function ReviewsPage() {
 
   const filteredReviews = reviews.filter(
     (review) =>
-      review.user?.name?.toLowerCase().includes(search.toLowerCase()) ||
+      review.student?.name?.toLowerCase().includes(search.toLowerCase()) ||
       review.course?.title?.toLowerCase().includes(search.toLowerCase()) ||
       review.comment?.toLowerCase().includes(search.toLowerCase()),
   );
@@ -50,19 +50,23 @@ export default function ReviewsPage() {
   };
 
   return (
-    <div>
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-800">Review Management</h1>
-        <p className="text-gray-600 mt-2">Manage all course reviews</p>
+    <div className="max-w-full overflow-hidden">
+      <div className="mb-6 lg:mb-8">
+        <h1 className="text-2xl lg:text-3xl font-bold text-gray-800">
+          Review Management
+        </h1>
+        <p className="text-sm lg:text-base text-gray-600 mt-2">
+          Manage all course reviews
+        </p>
       </div>
 
-      <div className="bg-white rounded-xl shadow-md p-6 mb-6">
+      <div className="bg-white rounded-xl shadow-md p-4 lg:p-6 mb-6">
         <input
           type="text"
           placeholder="Search reviews..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          className="w-full px-4 py-2 text-sm lg:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
         />
       </div>
 
@@ -71,30 +75,30 @@ export default function ReviewsPage() {
           <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
         </div>
       ) : (
-        <div className="grid grid-cols-1 gap-6">
+        <div className="grid grid-cols-1 gap-4 lg:gap-6">
           {filteredReviews.map((review) => (
             <div
               key={review._id}
-              className="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition"
+              className="bg-white rounded-xl shadow-md p-4 lg:p-6 hover:shadow-lg transition"
             >
               <div className="flex items-start justify-between mb-4">
                 <div className="flex-1">
                   <div className="flex items-center gap-3 mb-2">
-                    <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold text-lg">
-                      {review.user?.name?.charAt(0).toUpperCase()}
+                    <div className="w-10 h-10 lg:w-12 lg:h-12 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold text-base lg:text-lg">
+                      {review.student?.name?.charAt(0).toUpperCase()}
                     </div>
                     <div>
-                      <p className="font-bold text-gray-800">
-                        {review.user?.name}
+                      <p className="font-bold text-gray-800 text-sm lg:text-base">
+                        {review.student?.name}
                       </p>
-                      <p className="text-sm text-gray-500">
-                        {review.user?.email}
+                      <p className="text-xs lg:text-sm text-gray-500">
+                        {review.student?.email}
                       </p>
                     </div>
                   </div>
 
-                  <div className="ml-15">
-                    <p className="font-semibold text-gray-700 mb-2">
+                  <div className="lg:ml-15">
+                    <p className="font-semibold text-gray-700 mb-2 text-sm lg:text-base">
                       Course: {review.course?.title}
                     </p>
 
