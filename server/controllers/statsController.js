@@ -143,3 +143,85 @@ export const getAdminDashboardStats = catchAsync(async (req, res) => {
     },
   });
 });
+
+// @desc    Get payment analytics by year and month
+// @route   GET /api/stats/payment-analytics
+// @access  Private/Admin
+export const getPaymentAnalytics = catchAsync(async (req, res) => {
+  const { year } = req.query;
+  const selectedYear = year ? parseInt(year) : new Date().getFullYear();
+
+  // Get payment data for the selected year
+  const startDate = new Date(selectedYear, 0, 1);
+  const endDate = new Date(selectedYear, 11, 31, 23, 59, 59);
+
+  const payments = await Payment.aggregate([
+    {
+      $match: {
+        status: "completed",
+        createdAt: { $gte: startDate, $lte: endDate },
+      },
+    },
+    {
+      $group: {
+        _id: { $month: "$createdAt" },
+        totalAmount: { $sum: "$amount" },
+        count: { $sum: 1 },
+      },
+    },
+    { $sort: { _id: 1 } },
+  ]);
+
+  // Create array with all 12 months, filling in missing data with 0
+  const monthlyData = [];
+  const monthNames = [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
+  ];
+
+  for (let i = 1; i <= 12; i++) {
+    const monthData = payments.find((p) => p._id === i);
+    monthlyData.push({
+      month: monthNames[i - 1],
+      monthNumber: i,
+      totalAmount: monthData ? monthData.totalAmount : 0,
+      count: monthData ? monthData.count : 0,
+    });
+  }
+
+  // Get available years (starting from 2026)
+  const firstPayment = await Payment.findOne()
+    .sort({ createdAt: 1 })
+    .select("createdAt");
+  const currentYear = new Date().getFullYear();
+  const startYear = Math.max(
+    2026,
+    firstPayment ? new Date(firstPayment.createdAt).getFullYear() : 2026,
+  );
+
+  const availableYears = [];
+  for (let y = startYear; y <= currentYear; y++) {
+    availableYears.push(y);
+  }
+
+  res.status(200).json({
+    success: true,
+    data: {
+      year: selectedYear,
+      monthlyData,
+      availableYears,
+      totalRevenue: monthlyData.reduce((sum, m) => sum + m.totalAmount, 0),
+      totalTransactions: monthlyData.reduce((sum, m) => sum + m.count, 0),
+    },
+  });
+});
