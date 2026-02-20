@@ -17,6 +17,7 @@ export default function EnrollmentsPage() {
     setLoading(true);
     try {
       const response = await enrollmentsAPI.getAll();
+      console.log("Enrollments Response:", response.data); // Debug log
       setEnrollments(response.data.data.enrollments || []);
     } catch (error) {
       toast.error("Failed to fetch enrollments");
@@ -26,16 +27,14 @@ export default function EnrollmentsPage() {
     }
   };
 
-  const handleDelete = async (enrollmentId) => {
-    if (!confirm("Are you sure you want to delete this enrollment?")) return;
-
-    try {
-      await enrollmentsAPI.delete(enrollmentId);
-      toast.success("Enrollment deleted successfully");
-      fetchEnrollments();
-    } catch (error) {
-      toast.error("Failed to delete enrollment");
-    }
+  const formatDate = (dateString) => {
+    if (!dateString) return "N/A";
+    const date = new Date(dateString);
+    return date.toLocaleDateString("en-IN", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    });
   };
 
   const filteredEnrollments = enrollments.filter(
@@ -43,6 +42,18 @@ export default function EnrollmentsPage() {
       enrollment.student?.name?.toLowerCase().includes(search.toLowerCase()) ||
       enrollment.course?.title?.toLowerCase().includes(search.toLowerCase()),
   );
+
+  const totalEnrollments = filteredEnrollments.length;
+  const avgProgress =
+    totalEnrollments > 0
+      ? Math.round(
+          filteredEnrollments.reduce((sum, e) => sum + (e.progress || 0), 0) /
+            totalEnrollments,
+        )
+      : 0;
+  const completedCourses = filteredEnrollments.filter(
+    (e) => e.progress === 100,
+  ).length;
 
   const getProgressColor = (progress) => {
     if (progress >= 75) return "bg-green-500";
@@ -52,21 +63,45 @@ export default function EnrollmentsPage() {
   };
 
   return (
-    <div>
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-800">
+    <div className="max-w-full overflow-hidden">
+      <div className="mb-6 lg:mb-8">
+        <h1 className="text-2xl lg:text-3xl font-bold text-gray-800">
           Enrollment Management
         </h1>
-        <p className="text-gray-600 mt-2">Manage all course enrollments</p>
+        <p className="text-sm lg:text-base text-gray-600 mt-2">
+          View all course enrollments
+        </p>
       </div>
 
-      <div className="bg-white rounded-xl shadow-md p-6 mb-6">
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 lg:gap-6 mb-6">
+        <div className="bg-linear-to-br from-blue-500 to-blue-600 rounded-xl shadow-md p-4 lg:p-6 text-white">
+          <p className="text-xs lg:text-sm opacity-80">Total Enrollments</p>
+          <p className="text-xl lg:text-3xl font-bold mt-1 lg:mt-2">
+            {totalEnrollments}
+          </p>
+        </div>
+        <div className="bg-linear-to-br from-green-500 to-green-600 rounded-xl shadow-md p-4 lg:p-6 text-white">
+          <p className="text-xs lg:text-sm opacity-80">Completed Courses</p>
+          <p className="text-xl lg:text-3xl font-bold mt-1 lg:mt-2">
+            {completedCourses}
+          </p>
+        </div>
+        <div className="bg-linear-to-br from-purple-500 to-purple-600 rounded-xl shadow-md p-4 lg:p-6 text-white">
+          <p className="text-xs lg:text-sm opacity-80">Average Progress</p>
+          <p className="text-xl lg:text-3xl font-bold mt-1 lg:mt-2">
+            {avgProgress}%
+          </p>
+        </div>
+      </div>
+
+      <div className="bg-white rounded-xl shadow-md p-4 lg:p-6 mb-6">
         <input
           type="text"
           placeholder="Search by student or course..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          className="w-full px-4 py-2 text-sm lg:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
         />
       </div>
 
@@ -77,26 +112,23 @@ export default function EnrollmentsPage() {
       ) : (
         <div className="bg-white rounded-xl shadow-md overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="w-full">
+            <table className="w-full min-w-200">
               <thead className="bg-gray-50 border-b border-gray-200">
                 <tr>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase">
+                  <th className="px-3 lg:px-6 py-3 lg:py-4 text-left text-xs font-semibold text-gray-600 uppercase">
                     Student
                   </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase">
+                  <th className="px-3 lg:px-6 py-3 lg:py-4 text-left text-xs font-semibold text-gray-600 uppercase">
                     Course
                   </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase">
+                  <th className="px-3 lg:px-6 py-3 lg:py-4 text-left text-xs font-semibold text-gray-600 uppercase">
+                    Tutor
+                  </th>
+                  <th className="px-3 lg:px-6 py-3 lg:py-4 text-left text-xs font-semibold text-gray-600 uppercase">
                     Progress
                   </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase">
-                    Status
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase">
-                    Enrolled
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase">
-                    Actions
+                  <th className="px-3 lg:px-6 py-3 lg:py-4 text-left text-xs font-semibold text-gray-600 uppercase">
+                    Enrolled Date
                   </th>
                 </tr>
               </thead>
@@ -106,23 +138,33 @@ export default function EnrollmentsPage() {
                     key={enrollment._id}
                     className="hover:bg-gray-50 transition"
                   >
-                    <td className="px-6 py-4">
+                    <td className="px-3 lg:px-6 py-3 lg:py-4">
                       <div>
-                        <p className="font-medium text-gray-800">
+                        <p className="font-medium text-gray-800 text-sm lg:text-base">
                           {enrollment.student?.name}
                         </p>
-                        <p className="text-sm text-gray-500">
+                        <p className="text-xs lg:text-sm text-gray-500">
                           {enrollment.student?.email}
                         </p>
                       </div>
                     </td>
-                    <td className="px-6 py-4">
-                      <p className="font-medium text-gray-800">
+                    <td className="px-3 lg:px-6 py-3 lg:py-4">
+                      <p className="font-medium text-gray-800 text-sm lg:text-base">
                         {enrollment.course?.title}
                       </p>
                     </td>
-                    <td className="px-6 py-4">
-                      <div className="w-full">
+                    <td className="px-3 lg:px-6 py-3 lg:py-4">
+                      <div>
+                        <p className="font-medium text-gray-700 text-sm lg:text-base">
+                          {enrollment.course?.tutor?.name || "N/A"}
+                        </p>
+                        <p className="text-xs text-gray-500">
+                          {enrollment.course?.tutor?.email || ""}
+                        </p>
+                      </div>
+                    </td>
+                    <td className="px-3 lg:px-6 py-3 lg:py-4">
+                      <div className="w-full min-w-25">
                         <div className="flex items-center gap-2">
                           <div className="flex-1 bg-gray-200 rounded-full h-2">
                             <div
@@ -130,35 +172,27 @@ export default function EnrollmentsPage() {
                               style={{ width: `${enrollment.progress || 0}%` }}
                             />
                           </div>
-                          <span className="text-sm font-medium text-gray-600">
+                          <span className="text-xs lg:text-sm font-medium text-gray-600 whitespace-nowrap">
                             {enrollment.progress || 0}%
                           </span>
                         </div>
                       </div>
                     </td>
-                    <td className="px-6 py-4">
-                      <span
-                        className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                          enrollment.status === "completed"
-                            ? "bg-green-100 text-green-700"
-                            : enrollment.status === "active"
-                              ? "bg-blue-100 text-blue-700"
-                              : "bg-gray-100 text-gray-700"
-                        }`}
-                      >
-                        {enrollment.status}
+                    <td className="px-3 lg:px-6 py-3 lg:py-4">
+                      <span className="text-xs lg:text-sm font-medium text-gray-800">
+                        {formatDate(enrollment.enrolledAt)}
                       </span>
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-600">
-                      {new Date(enrollment.enrollmentDate).toLocaleDateString()}
-                    </td>
-                    <td className="px-6 py-4">
-                      <button
-                        onClick={() => handleDelete(enrollment._id)}
-                        className="px-3 py-1 bg-red-600 text-white rounded-lg hover:bg-red-700 transition text-sm"
-                      >
-                        Delete
-                      </button>
+                      <p className="text-xs text-gray-500 mt-1">
+                        {enrollment.enrolledAt
+                          ? new Date(enrollment.enrolledAt).toLocaleTimeString(
+                              "en-IN",
+                              {
+                                hour: "2-digit",
+                                minute: "2-digit",
+                              },
+                            )
+                          : ""}
+                      </p>
                     </td>
                   </tr>
                 ))}
