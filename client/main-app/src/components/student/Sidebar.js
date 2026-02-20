@@ -5,9 +5,6 @@ import {
   FiBookOpen,
   FiCreditCard,
   FiUser,
-  FiCamera,
-  FiShield,
-  FiXCircle,
 } from "react-icons/fi";
 
 const Sidebar = () => {
@@ -17,13 +14,10 @@ const Sidebar = () => {
     { name: "Dashboard", icon: FiGrid, href: "/student/profile" },
     { name: "Courses", icon: FiBookOpen, href: "/student/courses" },
     { name: "Payments", icon: FiCreditCard, href: "/student/payments" },
-    { name: "Profile", icon: FiUser, href: "/student/public-profile" },
-    { name: "Photo", icon: FiCamera, href: "/student/photo" },
-    { name: "Account Security", icon: FiShield, href: "/student/account-security" },
-    { name: "Close Account", icon: FiXCircle, href: "/student/close-account", danger: true },
+    { name: "Profile", icon: FiUser, href: "/student/settings" },
   ];
 
-  const isActive = (path) => router.asPath === path;
+  const isActive = (path) => router.asPath === path || router.asPath.startsWith(path + "?");
 
   return (
     <aside className="hidden lg:flex sticky top-0 left-0 min-h-screen w-16 md:w-64 shrink-0 flex-col bg-transparent p-3 text-gray-300 transition-all duration-300 md:p-6">
@@ -34,9 +28,7 @@ const Sidebar = () => {
             <Link key={item.name} href={item.href}>
               <span
                 className={`flex items-center gap-4 px-3 py-3 rounded-lg transition-all duration-200 cursor-pointer font-medium ${
-                  item.danger
-                    ? "hover:bg-red-500/10 hover:text-red-400 text-gray-400"
-                    : isActive(item.href)
+                  isActive(item.href)
                     ? "bg-[#6D28D9] text-white"
                     : "hover:bg-[#2B2B40] hover:text-white"
                 }`}
@@ -44,9 +36,7 @@ const Sidebar = () => {
                 <div className="flex items-center justify-center">
                   <item.icon
                     className={`w-5 h-5 ${
-                      item.danger
-                        ? "text-gray-400"
-                        : isActive(item.href)
+                      isActive(item.href)
                         ? "text-white"
                         : "text-gray-400"
                     }`}

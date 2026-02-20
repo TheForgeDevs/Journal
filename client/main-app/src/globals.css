@@ -139,3 +139,13 @@ body {
   background-size: 200% 200%;
   animation: gradientShift 3s ease infinite;
 }
+
+/* Hide Scrollbar */
+.scrollbar-hide {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;  /* Chrome, Safari and Opera */
+}
