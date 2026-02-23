@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { useRouter } from 'next/router';
 import { LayoutDashboard, BookOpen, Users, IndianRupee, Star, UserCircle, LogOut } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
@@ -31,9 +32,21 @@ export default function TutorSidebar() {
         {user && (
           <div className="p-4 bg-linear-to-br from-purple-900/40 to-pink-900/40 rounded-xl border border-purple-500/30 hover:border-purple-500/50 transition-all">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-linear-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-bold text-lg shrink-0">
-                {user.name?.charAt(0).toUpperCase()}
-              </div>
+              {user?.avatar ? (
+                <div className="w-12 h-12 rounded-full overflow-hidden shrink-0 ring-2 ring-purple-500/30">
+                  <Image
+                    src={user.avatar}
+                    alt={user?.name || 'Tutor avatar'}
+                    width={48}
+                    height={48}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              ) : (
+                <div className="w-12 h-12 bg-linear-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-bold text-lg shrink-0">
+                  {user.name?.charAt(0).toUpperCase()}
+                </div>
+              )}
               <div className="min-w-0 flex-1">
                 <p className="font-bold text-white text-sm truncate">{user.name}</p>
                 <p className="text-xs text-gray-400 truncate">{user.email}</p>

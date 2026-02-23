@@ -3,7 +3,9 @@ import { useRouter } from 'next/router';
 import { useAuth } from '../../context/AuthContext';
 import { getDashboardStats } from '../../services/apiService';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { FiDownload } from 'react-icons/fi';
 import TutorLayout from '@/components/tutor/TutorLayout';
+import { generateInvoice } from '@/utils/invoiceGenerator';
 
 export default function TutorPayments() {
   const router = useRouter();
@@ -14,6 +16,7 @@ export default function TutorPayments() {
     recentTransactions: []
   });
   const [loading, setLoading] = useState(true);
+  const [showAllTransactions, setShowAllTransactions] = useState(false);
 
   // Authentication check and redirect
   useEffect(() => {
@@ -32,6 +35,17 @@ export default function TutorPayments() {
       fetchStats();
     }
   }, [authLoading, user]);
+
+  useEffect(() => {
+    if (!showAllTransactions) return undefined;
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [showAllTransactions]);
 
   const fetchStats = async () => {
     try {
@@ -90,11 +104,21 @@ export default function TutorPayments() {
           </div>
 
           {/* Recent Transactions Table (Requirement 10) */}
-          <div className="bg-linear-to-br from-[#1E1E2E] to-[#2B2B40] p-6 rounded-2xl shadow-sm border border-gray-800/50 h-96 overflow-y-auto">
-            <h3 className="text-xl font-bold mb-6 text-white">Recent Transactions</h3>
+          <div className="bg-linear-to-br from-[#1E1E2E] to-[#2B2B40] p-6 rounded-2xl shadow-sm border border-gray-800/50 h-96">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-xl font-bold text-white">Recent Transactions</h3>
+              {stats.recentTransactions.length > 0 && (
+                <button
+                  onClick={() => setShowAllTransactions(true)}
+                  className="text-green-400 font-bold text-xs hover:text-green-300 hover:bg-green-600/10 px-2 py-1 rounded-lg transition-all duration-300 border border-green-500/30 hover:border-green-500/50 whitespace-nowrap"
+                >
+                  View All ({stats.recentTransactions.length})
+                </button>
+              )}
+            </div>
             <div className="space-y-4">
               {stats.recentTransactions.length > 0 ? (
-                stats.recentTransactions.map((tx) => (
+                stats.recentTransactions.slice(0, 4).map((tx) => (
                   <div key={tx._id} className="flex justify-between items-center p-3 hover:bg-[#2B2B40]/60 rounded-lg transition-colors border border-gray-800/30 hover:border-purple-500/30">
                     <div>
                       <p className="font-semibold text-white">Payment received</p>
@@ -113,6 +137,56 @@ export default function TutorPayments() {
 
         </div>
       </div>
+
+      {/* All Transactions Modal */}
+      {showAllTransactions && (
+        <div
+          className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+          onClick={() => setShowAllTransactions(false)}
+        >
+          <div
+            className="bg-linear-to-br from-[#1E1E2E] to-[#2B2B40] rounded-2xl p-6 max-w-2xl w-full shadow-2xl border border-gray-800/50 max-h-[80vh] overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-xl font-bold text-white">All Transactions</h3>
+              <button
+                onClick={() => setShowAllTransactions(false)}
+                className="text-gray-400 hover:text-white p-2 hover:bg-gray-700/50 rounded-lg transition-all duration-300"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="space-y-3">
+              {stats.recentTransactions.length > 0 ? (
+                stats.recentTransactions.map((tx) => (
+                  <div key={tx._id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-4 hover:bg-[#2B2B40]/60 rounded-lg transition-colors border border-gray-800/30 hover:border-purple-500/30">
+                    <div>
+                      <p className="font-semibold text-white">Payment received</p>
+                      <p className="text-xs text-gray-400">{new Date(tx.createdAt).toLocaleDateString()}</p>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <span className="text-green-400 font-bold bg-green-600/20 px-3 py-1 rounded-full text-sm border border-green-500/50">
+                        +₹{tx.amount}
+                      </span>
+                      <button
+                        onClick={() => generateInvoice(tx, user)}
+                        className="inline-flex items-center gap-1.5 text-xs font-semibold text-purple-300 hover:text-purple-200 border border-purple-500/30 hover:border-purple-500/60 px-2.5 py-1 rounded-md transition-all"
+                      >
+                        <FiDownload size={14} />
+                        PDF
+                      </button>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <p className="text-gray-400 italic">No recent transactions found.</p>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </TutorLayout>
   );
 }
