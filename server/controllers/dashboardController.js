@@ -144,7 +144,7 @@ export const getDashboardStats = catchAsync(async (req, res) => {
     .populate({
       path: "course",
       select:
-        "title thumbnail category tutor sections rating numReviews enrolledStudents",
+        "title thumbnail category tutor modules lectures totalDuration rating numReviews enrolledStudents",
       populate: { path: "tutor", select: "name email avatar" },
     })
     .sort({ createdAt: -1 });
@@ -157,15 +157,22 @@ export const getDashboardStats = catchAsync(async (req, res) => {
     let lectureCount = 0;
     let courseDuration = 0;
 
-    if (course.sections && Array.isArray(course.sections)) {
-      course.sections.forEach((section) => {
-        if (section.lectures && Array.isArray(section.lectures)) {
-          lectureCount += section.lectures.length;
-          section.lectures.forEach((lecture) => {
+    if (course.modules && Array.isArray(course.modules)) {
+      course.modules.forEach((module) => {
+        if (module.lectures && Array.isArray(module.lectures)) {
+          lectureCount += module.lectures.length;
+          module.lectures.forEach((lecture) => {
             courseDuration += lecture.duration || 0;
           });
         }
       });
+    } else if (course.lectures && Array.isArray(course.lectures)) {
+      lectureCount = course.lectures.length;
+      course.lectures.forEach((lecture) => {
+        courseDuration += lecture.duration || 0;
+      });
+    } else if (course.totalDuration) {
+      courseDuration = course.totalDuration;
     }
 
     totalTutorials += lectureCount;

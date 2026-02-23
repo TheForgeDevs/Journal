@@ -83,6 +83,47 @@ const DashboardHome = ({ user }) => {
     return parts.join(" ");
   };
 
+  const toSeconds = (value) => {
+    const num = Number(value);
+    if (!Number.isFinite(num)) return 0;
+    return Math.max(0, Math.floor(num));
+  };
+
+  const getCourseStats = (course) => {
+    let lectureCount = 0;
+    let durationSeconds = 0;
+
+    if (course?.sections && Array.isArray(course.sections)) {
+      course.sections.forEach((section) => {
+        if (section.lectures && Array.isArray(section.lectures)) {
+          lectureCount += section.lectures.length;
+          section.lectures.forEach((lecture) => {
+            durationSeconds += toSeconds(lecture.duration);
+          });
+        }
+      });
+    } else if (course?.modules && Array.isArray(course.modules)) {
+      course.modules.forEach((module) => {
+        if (module.lectures && Array.isArray(module.lectures)) {
+          lectureCount += module.lectures.length;
+          module.lectures.forEach((lecture) => {
+            durationSeconds += toSeconds(lecture.duration);
+          });
+        }
+      });
+    } else if (course?.lectures && Array.isArray(course.lectures)) {
+      lectureCount = course.lectures.length;
+      course.lectures.forEach((lecture) => {
+        durationSeconds += toSeconds(lecture.duration);
+      });
+    }
+
+    return {
+      lectureCount: course?.lectureCount || lectureCount,
+      durationSeconds: course?.duration || durationSeconds,
+    };
+  };
+
   if (loading) {
     return (
       <div className="space-y-6 animate-pulse">
@@ -257,7 +298,10 @@ const DashboardHome = ({ user }) => {
                 return bDate - aDate;
               })
               .slice(0, 3)
-              .map((course) => (
+              .map((course) => {
+                const { lectureCount, durationSeconds } = getCourseStats(course);
+
+                return (
               <div
                 key={course._id}
                 className="bg-linear-to-br from-[#1E1E2E] to-[#2B2B40] p-5 rounded-3xl border border-gray-800/50 hover:border-purple-500/50 transition-all duration-300 group hover:shadow-2xl hover:shadow-purple-900/30 hover:-translate-y-2"
@@ -293,11 +337,11 @@ const DashboardHome = ({ user }) => {
                 <div className="flex items-center gap-3 text-xs text-gray-400 mb-5 mt-3">
                   <span className="flex items-center gap-1.5 bg-[#2B2B40] px-3 py-1.5 rounded-lg border border-gray-700/50">
                     <FiPlayCircle className="text-purple-400" />{" "}
-                    {course.lectureCount || 0} Lessons
+                    {lectureCount} Lessons
                   </span>
                   <span className="flex items-center gap-1.5 bg-[#2B2B40] px-3 py-1.5 rounded-lg border border-gray-700/50">
                     <FiClock className="text-pink-400" />{" "}
-                    {formatDuration(course.duration)}
+                    {formatDuration(durationSeconds)}
                   </span>
                 </div>
 
@@ -315,7 +359,8 @@ const DashboardHome = ({ user }) => {
                   </div>
                 </div>
               </div>
-            ))
+            );
+          })
           )}
         </div>
       </div>
