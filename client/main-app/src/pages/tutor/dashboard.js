@@ -251,20 +251,20 @@ export default function TutorDashboard() {
             </div>
             {stats.recentTransactions?.length > 0 && (
               <button 
-                onClick={() => setShowAllTransactions(true)}
+                onClick={() => router.push("/tutor/payments")}
                 className="text-green-400 font-bold text-xs hover:text-green-300 hover:bg-green-600/10 px-2 py-1 rounded-lg transition-all duration-300 border border-green-500/30 hover:border-green-500/50 whitespace-nowrap"
               >
                 View All ({stats.recentTransactions.length})
               </button>
             )}
           </div>
-          <div className="space-y-1.5 sm:space-y-2">
+          <div className="space-y-1.5 sm:space-y-2 overflow-hidden">
             {dataLoading ? (
               <div className="flex items-center justify-center py-8">
                 <div className="animate-spin rounded-full h-8 w-8 border-2 border-green-600/30 border-t-green-600"></div>
               </div>
             ) : stats.recentTransactions?.length > 0 ? (
-              stats.recentTransactions.slice(0, 3).map((tx) => (
+              stats.recentTransactions.slice(0, 4).map((tx) => (
                 <div key={tx._id} className="group/item flex justify-between items-center p-2 sm:p-3 hover:bg-[#2B2B40]/60 rounded-lg transition-all cursor-pointer border border-gray-800/30 hover:border-green-500/40 duration-300">
                   <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
                     <div className="w-8 h-8 sm:w-9 sm:h-9 bg-green-600/20 rounded-lg flex items-center justify-center font-black text-green-400 group-hover/item:bg-green-600 group-hover/item:text-white transition-all duration-300 shadow-lg shrink-0 border border-green-500/50">

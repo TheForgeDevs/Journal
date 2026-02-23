@@ -18,78 +18,81 @@ export default function TutorSidebar() {
   const { user, logout } = useAuth();
 
   return (
-    <div className="w-64 lg:w-72 p-6 flex flex-col overflow-y-auto bg-linear-to-b from-[#1E1E2E] to-[#161620] border-r border-gray-800/50 h-screen">
+    <div className="h-screen w-full flex flex-col bg-linear-to-b from-[#1E1E2E] to-[#161620] border-r border-gray-800/50">
       
-      {/* Header with Logo/Branding */}
-      <div className="mb-10">
-        <Image 
-          src="/logo.png" 
-          alt="Journal Logo" 
-          width={150} 
-          height={50} 
-          className="object-contain"
-          priority
-        />
-        <p className="text-xs text-gray-400 mt-2 font-semibold uppercase tracking-wider">Tutor Dashboard</p>
-      </div>
+      {/* Top Section - Logo & User Info */}
+      <div className="flex flex-col shrink-0 px-6 py-4 space-y-4 border-b border-gray-800/30">
+        {/* Tutor Dashboard Header */}
+        <div className="text-center">
+          <p className="text-xs text-gray-500 font-semibold uppercase tracking-wider">Tutor</p>
+          <p className="text-xl font-bold bg-linear-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">Dashboard</p>
+        </div>
 
-      {/* User Info Card */}
-      {user && (
-        <div className="mb-8 p-4 bg-linear-to-br from-purple-900/40 to-pink-900/40 rounded-2xl border border-purple-500/30 shadow-lg hover:shadow-xl hover:border-purple-500/50 transition-all duration-300">
-          <div className="flex items-center gap-3">
-            <div className="w-14 h-14 bg-linear-to-br from-purple-600 to-pink-600 rounded-full flex items-center justify-center text-white font-black text-lg shrink-0 shadow-lg">
-              {user.name?.charAt(0).toUpperCase()}
-            </div>
-            <div className="overflow-hidden flex-1">
-              <p className="font-bold text-white text-sm truncate">{user.name}</p>
-              <p className="text-xs text-gray-400 truncate font-medium">{user.email}</p>
+        {/* User Info Card */}
+        {user && (
+          <div className="p-4 bg-linear-to-br from-purple-900/40 to-pink-900/40 rounded-xl border border-purple-500/30 hover:border-purple-500/50 transition-all">
+            <div className="flex items-center gap-3">
+              {user?.avatar ? (
+                <div className="w-12 h-12 rounded-full overflow-hidden shrink-0 ring-2 ring-purple-500/30">
+                  <Image
+                    src={user.avatar}
+                    alt={user?.name || 'Tutor avatar'}
+                    width={48}
+                    height={48}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              ) : (
+                <div className="w-12 h-12 bg-linear-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-bold text-lg shrink-0">
+                  {user.name?.charAt(0).toUpperCase()}
+                </div>
+              )}
+              <div className="min-w-0 flex-1">
+                <p className="font-bold text-white text-sm truncate">{user.name}</p>
+                <p className="text-xs text-gray-400 truncate">{user.email}</p>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
 
       {/* Navigation Menu */}
-      <nav className="space-y-2 flex-1">
+      <nav className="flex-1 overflow-y-auto py-6 px-3 space-y-1">
         {menuItems.map((item) => {
           const isActive = router.pathname === item.path || router.pathname.startsWith(item.path + '/');
+          const Icon = item.icon;
+          
           return (
-            <Link key={item.name} href={item.path}>
-              <div className={`flex items-center gap-3 px-4 py-3.5 rounded-2xl cursor-pointer transition-all duration-300 group relative overflow-hidden ${
+            <Link 
+              key={item.name} 
+              href={item.path}
+              className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
                 isActive 
-                ? 'bg-linear-to-r from-purple-600 to-pink-500 text-white shadow-lg shadow-purple-500/30 scale-105' 
-                : 'text-gray-400 hover:bg-linear-to-r hover:from-purple-900/40 hover:to-pink-900/40 hover:text-purple-300 hover:shadow-md'
-              }`}>
-                <div className={`transition-transform duration-300 ${isActive ? 'scale-110' : 'group-hover:scale-110'}`}>
-                  <item.icon size={22} className="shrink-0" />
-                </div>
-                <span className="font-bold text-sm group-hover:underline underline-offset-4">{item.name}</span>
-                {isActive && (
-                  <div className="ml-auto w-2.5 h-2.5 bg-white rounded-full shrink-0 shadow-lg animate-pulse"></div>
-                )}
-              </div>
+                  ? 'bg-linear-to-r from-purple-600 to-pink-500 text-white shadow-lg shadow-purple-500/30' 
+                  : 'text-gray-400 hover:text-purple-300 hover:bg-gray-800/30'
+              }`}
+            >
+              <Icon size={20} className="shrink-0" />
+              <span className="font-semibold text-sm">{item.name}</span>
+              {isActive && (
+                <div className="ml-auto w-2 h-2 bg-white rounded-full animate-pulse"></div>
+              )}
             </Link>
           );
         })}
       </nav>
 
-      {/* Logout Button */}
-      <div className="mt-6 pt-6 border-t border-gray-700/50">
+      {/* Bottom Section - Logout & Footer */}
+      <div className="flex flex-col shrink-0 px-3 py-6 space-y-4 border-t border-gray-800/30">
+        {/* Logout Button */}
         <button 
           onClick={() => logout()}
-          className="w-full flex items-center justify-center gap-2 px-4 py-3.5 rounded-2xl bg-linear-to-r from-red-500/20 to-orange-500/20 hover:from-red-500/40 hover:to-orange-500/40 text-red-400 hover:text-red-300 font-bold transition-all duration-300 border border-red-500/20 hover:border-red-500/40 group shadow-lg hover:shadow-xl"
+          className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 hover:text-red-300 font-semibold text-sm border border-red-500/20 hover:border-red-500/40 transition-all"
         >
-          <LogOut size={20} className="group-hover:rotate-12 transition-transform" />
-          <span>Logout</span>
+          <LogOut size={18} />
+          Logout
         </button>
-      </div>
 
-      {/* Footer - Version info */}
-      <div className="mt-6 pt-4 border-t border-gray-700/50">
-        <p className="text-xs text-gray-500 text-center font-semibold">
-          Journal Learning Platform
-          <br />
-          <span className="text-[10px] text-gray-600">v2.0 • Tutor Dashboard</span>
-        </p>
       </div>
     </div>
   );
