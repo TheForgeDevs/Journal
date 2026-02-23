@@ -128,7 +128,7 @@ export default function Research() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-950 to-gray-900">
+    <div className="min-h-screen bg-linear-to-b from-gray-950 to-gray-900">
       {/* Hero Section */}
       <section className="pt-32 pb-20 px-4 md:px-6 relative overflow-hidden">
         <div className="absolute top-0 left-1/4 w-96 h-96 bg-purple-600/10 rounded-full blur-3xl"></div>
@@ -144,7 +144,7 @@ export default function Research() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link href="/contact">
-                <button className="px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold rounded-lg hover:shadow-lg hover:shadow-purple-500/50 transition-all duration-300">
+                <button className="px-8 py-4 bg-linear-to-r from-purple-600 to-pink-600 text-white font-bold rounded-lg hover:shadow-lg hover:shadow-purple-500/50 transition-all duration-300">
                   Start Your Research Journey
                 </button>
               </Link>
@@ -250,10 +250,10 @@ export default function Research() {
             {researchProcess.map((item, index) => (
               <div key={index} className="relative">
                 {index < researchProcess.length - 1 && (
-                  <div className="hidden lg:block absolute top-20 -right-3 w-6 h-1 bg-gradient-to-r from-purple-600 to-pink-600"></div>
+                  <div className="hidden lg:block absolute top-20 -right-3 w-6 h-1 bg-linear-to-r from-purple-600 to-pink-600"></div>
                 )}
                 <div className="bg-[#1a1a2e] rounded-lg p-6 border border-purple-500/20 hover:border-purple-500/50 transition-all relative z-10">
-                  <div className="w-12 h-12 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full flex items-center justify-center text-white font-bold mb-4">
+                  <div className="w-12 h-12 bg-linear-to-r from-purple-600 to-pink-600 rounded-full flex items-center justify-center text-white font-bold mb-4">
                     {item.step}
                   </div>
                   <h3 className="text-white font-bold mb-2 text-lg">{item.title}</h3>
@@ -287,7 +287,7 @@ export default function Research() {
               </div>
 
               <Link href="/contact">
-                <button className="px-8 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold rounded-lg hover:shadow-lg hover:shadow-purple-500/50 transition-all duration-300">
+                <button className="px-8 py-3 bg-linear-to-r from-purple-600 to-pink-600 text-white font-bold rounded-lg hover:shadow-lg hover:shadow-purple-500/50 transition-all duration-300">
                   Get Personalized Guidance
                 </button>
               </Link>
@@ -364,7 +364,7 @@ export default function Research() {
       {/* Final CTA */}
       <section className="py-20 px-4 md:px-6">
         <div className="max-w-4xl mx-auto text-center">
-          <div className="bg-gradient-to-r from-purple-600/20 to-pink-600/20 rounded-2xl p-12 border border-purple-500/30">
+          <div className="bg-linear-to-r from-purple-600/20 to-pink-600/20 rounded-2xl p-12 border border-purple-500/30">
             <h2 className="text-4xl font-bold text-white mb-4">
               Ready to Publish Your <span className="bg-linear-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">Research?</span>
             </h2>
@@ -372,7 +372,7 @@ export default function Research() {
               Get personalized guidance from our research experts and join hundreds of successfully published researchers
             </p>
             <Link href="/contact">
-              <button className="px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold rounded-lg hover:shadow-lg hover:shadow-purple-500/50 transition-all duration-300 inline-flex items-center gap-2">
+              <button className="px-8 py-4 bg-linear-to-r from-purple-600 to-pink-600 text-white font-bold rounded-lg hover:shadow-lg hover:shadow-purple-500/50 transition-all duration-300 inline-flex items-center gap-2">
                 <FiCalendar className="w-5 h-5" />
                 Schedule Free Consultation
               </button>
