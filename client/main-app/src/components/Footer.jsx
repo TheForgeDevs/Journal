@@ -51,33 +51,8 @@ export default function Footer() {
     { name: "YouTube", icon: FiYoutube, href: "https://youtube.com" },
   ];
 
-  const stats = [
-    { icon: FiBookOpen, value: "1000+", label: "Courses" },
-    { icon: FiUsers, value: "50K+", label: "Students" },
-    { icon: FiAward, value: "500+", label: "Expert Tutors" },
-    { icon: FiHeart, value: "4.8/5", label: "Avg Rating" },
-  ];
-
   return (
-    <footer className="bg-linear-to-br from-gray-900 via-gray-800 to-gray-900 text-gray-300">
-      {/* Stats Bar */}
-      <div className="border-b border-gray-700">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            {stats.map((stat, index) => (
-              <div key={index} className="text-center">
-                <div className="flex justify-center mb-2">
-                  <stat.icon className="w-8 h-8 text-purple-400" />
-                </div>
-                <div className="text-2xl md:text-3xl font-bold text-white mb-1">
-                  {stat.value}
-                </div>
-                <div className="text-sm text-gray-400">{stat.label}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
+    <footer className="border-t border-gray-700 bg-linear-to-br from-gray-900 via-gray-800 to-gray-900 text-gray-300">
 
       {/* Main Footer Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
